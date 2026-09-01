@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sea-ops-arena"
-version = "0.3.0"
+version = "0.4.0"
 description = "운영형 AI의 행동 제안을 검증하기 위한 공개 벤치마크 하네스"
 requires-python = ">=3.11"
 license = {text = "공개 소스 형태로 제공되며 별도의 라이선스 권리를 부여하지 않음"}
@@ -12,6 +12,7 @@ license = {text = "공개 소스 형태로 제공되며 별도의 라이선스 �
 [project.scripts]
 sea-ops-arena = "sea_ops_arena.cli:main"
 sea-ops-arena-compare = "sea_ops_arena.compare_cli:main"
+sea-ops-arena-repeat = "sea_ops_arena.repeat_cli:main"
 sea-ops-arena-demo = "sea_ops_arena.demo:main"
 
 [tool.setuptools]
