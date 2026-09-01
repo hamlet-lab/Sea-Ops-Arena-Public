@@ -19,6 +19,7 @@ class ComparisonRow:
 def compare_decision_files(
     suite_path: str | Path,
     decision_paths: list[str | Path],
+    input_pack_path: str | Path | None = None,
 ) -> tuple[ComparisonRow, ...]:
     """같은 공개 시나리오에 여러 판단 결과 파일을 적용해 비교한다."""
 
@@ -30,7 +31,7 @@ def compare_decision_files(
 
     for raw_path in decision_paths:
         path = Path(raw_path)
-        validate_public_result_binding(suite_path, path)
+        validate_public_result_binding(suite_path, path, input_pack_path)
         decisions = load_decisions(path)
         validate_decision_coverage(suite, decisions)
         environment = SyntheticEnvironment(
