@@ -7,9 +7,13 @@ from .template import write_public_result_template
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="공개 시나리오에 결합된 최소 결과 템플릿을 생성합니다."
+        description="공개 시나리오와 정답 비노출 입력팩에 결합된 최소 결과 템플릿을 생성합니다."
     )
-    parser.add_argument("--suite", required=True, help="공개 시나리오 JSON 파일")
+    parser.add_argument("--suite", required=True, help="평가용 공개 시나리오 JSON 파일")
+    parser.add_argument(
+        "--input-pack",
+        help="모델이 실제로 본 정답 비노출 입력팩 JSON. fixture 이외의 결과에는 필수입니다.",
+    )
     parser.add_argument("--output", required=True, help="생성할 공개 결과 템플릿 JSON")
     parser.add_argument("--label", required=True, help="외부에 공개할 결과 묶음 이름")
     parser.add_argument(
@@ -29,6 +33,7 @@ def main() -> None:
         args.output,
         label=args.label,
         kind=args.kind,
+        input_pack_path=args.input_pack,
         model_name=args.model_name,
         model_version=args.model_version,
         recorded_at=args.recorded_at,
