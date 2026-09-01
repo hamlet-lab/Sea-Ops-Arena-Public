@@ -1,0 +1,10 @@
+{
+  "profile": "balanced",
+  "kind": "synthetic",
+  "description": "공개 기대값과 동일하게 미리 정한 합성 응답",
+  "decisions": {
+    "req-customer-return": "proceed",
+    "req-office-purchase": "defer",
+    "req-inventory-restock": "reject"
+  }
+}
