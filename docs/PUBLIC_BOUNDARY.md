@@ -1,119 +1,124 @@
-# Public Boundary
+# 공개 범위 원칙
 
-This repository is a public evaluation surface. It must remain useful without exposing the internals of any proprietary controller.
+이 저장소는 외부 검증을 위한 공개 평가 환경입니다. 공개 자료만으로도 실험을 이해하고 재현할 수 있어야 하지만, 비공개 핵심 기술의 내부 구현까지 드러나서는 안 됩니다.
 
-## 1. Boundary rule
+## 1. 기본 원칙
 
-Public code may describe **inputs, outputs, scenarios, simulator behavior, and scoring**.
+공개 저장소에서는 다음을 설명할 수 있습니다.
 
-Public code must not describe **how a proprietary controller internally reasons, represents state, evaluates policy, resolves authority, performs admission, or commits changes**.
+- 입력과 출력
+- 공개 시나리오
+- 공개 시뮬레이터의 동작
+- 평가 방식과 재현 절차
 
-The stable public seam is:
+반대로 비공개 의사결정 시스템이 내부에서 **어떻게 판단하고, 상태를 표현하고, 정책을 평가하고, 권한을 처리하며, 최종 결정을 만드는지**는 공개하지 않습니다.
+
+공개 인터페이스의 기준선은 다음과 같습니다.
 
 ```text
 ExecutionRequest -> ControllerAdapter -> DecisionReceipt
 ```
 
-Everything behind `ControllerAdapter` is opaque unless it is an independently public implementation contributed specifically for demonstration purposes.
+`ControllerAdapter` 뒤쪽은 외부에서 보이지 않는 영역으로 취급합니다. 단, 공개 목적으로 별도 제작된 독립적인 예제 구현은 예외로 둘 수 있습니다.
 
-## 2. Allowed public material
+## 2. 공개 가능한 내용
 
-The following categories are allowed when they are controller-agnostic:
+다음 항목은 특정 비공개 시스템의 내부 구조와 무관하게 설계된 경우 공개할 수 있습니다.
 
-- scenario fixtures and synthetic environments,
-- benchmark metadata and versioning,
-- model/agent output normalization,
-- execution request schemas,
-- decision receipt schemas,
-- simulator state used only by the public benchmark,
-- scoring functions whose publication does not reveal proprietary controller criteria,
-- deterministic replay of public requests and receipts,
-- reproducibility metadata,
-- aggregate reports and benchmark results,
-- adapters that call an external controller through a narrow documented interface.
+- 합성 시나리오와 테스트 환경
+- 벤치마크 메타데이터 및 버전 정보
+- AI/에이전트 출력의 공통 형식 변환
+- 실행 요청 형식
+- 공개 판단 결과 형식
+- 공개 벤치마크 전용 시뮬레이터 상태
+- 비공개 판단 기준을 드러내지 않는 평가 함수
+- 공개 요청·결과의 재현 기능
+- 재현성 메타데이터
+- 종합 리포트와 벤치마크 결과
+- 제한된 공개 인터페이스를 통해 외부 시스템과 연결하는 어댑터
 
-## 3. Prohibited public material
+## 3. 공개하면 안 되는 내용
 
-Do not commit any of the following:
+다음 항목은 이 저장소에 커밋하지 않습니다.
 
-- proprietary controller source code,
-- internal controller state schemas or state-transition logic,
-- policy or governance implementations,
-- internal gate/admission/commit logic,
-- internal scoring or hidden evaluation criteria,
-- proprietary rule tables or policy files,
-- private architecture diagrams or composition documents,
-- internal code names, unpublished component names, or internal filenames,
-- private research notes, patent drafting material, invention notebooks, or claim mappings,
-- production credentials, endpoints, infrastructure details, traces, prompts, or raw customer data,
-- redaction deny-lists that enumerate confidential names or files,
-- tests whose assertions disclose confidential invariants,
-- comments or commit messages that explain confidential implementation choices,
-- copied Git history, commits, trees, patches, or blobs from a private development repository.
+- 비공개 핵심 기술의 소스 코드
+- 내부 상태 구조나 상태 전이 로직
+- 비공개 정책·거버넌스·권한 처리 구현
+- 내부 판단 기준이나 숨겨진 평가 기준
+- 비공개 규칙표 또는 정책 파일
+- 내부 아키텍처 구성 문서와 상세 다이어그램
+- 공개되지 않은 내부 명칭, 코드명, 파일명
+- 비공개 연구 노트, 특허 초안, 발명 기록, 청구항 대응 자료
+- 운영 자격증명, 내부 엔드포인트, 인프라 정보, 비공개 로그·프롬프트·고객 데이터
+- 비밀 명칭이나 파일명을 나열하는 공개 차단 목록
+- 비공개 불변조건이나 내부 설계를 역으로 설명해버리는 테스트
+- 비공개 구현 선택을 설명하는 주석 또는 커밋 메시지
+- 비공개 개발 저장소에서 가져온 Git 이력, 커밋, 트리, 패치, blob
 
-## 4. Semantic review beats string review
+## 4. 문자열보다 의미를 검토한다
 
-A file can leak proprietary information even if it contains none of the forbidden names.
+민감한 단어가 직접 등장하지 않아도 기술이 유출될 수 있습니다.
 
-Before publication, review whether a technically competent reader could infer any proprietary controller mechanism by combining:
+공개 전에는 여러 파일을 조합했을 때 기술적으로 숙련된 독자가 비공개 내부 구조를 역추론할 수 있는지 확인해야 합니다. 특히 다음 요소를 함께 봅니다.
 
-- type names,
-- schemas,
-- test invariants,
-- examples,
-- state transitions,
-- policy tables,
-- diagrams,
-- error messages,
-- benchmark categories,
-- commit history.
+- 타입명과 스키마
+- 테스트의 전제와 불변조건
+- 예제
+- 상태 변화
+- 정책표
+- 다이어그램
+- 오류 메시지
+- 벤치마크 분류
+- 커밋 이력
 
-A literal secret scan is necessary but not sufficient.
+단순한 비밀정보 문자열 검색은 필요하지만 그것만으로 충분하지 않습니다.
 
-## 5. Controller adapters
+## 5. 외부 시스템 연결부
 
-A public adapter should do only what is required to transport a request and receive a receipt.
+공개 어댑터는 요청을 전달하고 결과를 받는 데 필요한 최소 기능만 가져야 합니다.
 
-It may expose:
+공개 가능한 항목의 예시는 다음과 같습니다.
 
-- protocol version,
-- request identifier,
-- public request payload,
-- public decision status,
-- public reason code,
-- optional human-readable explanation,
-- optional receipt integrity/provenance metadata.
+- 프로토콜 버전
+- 요청 식별자
+- 공개 요청 데이터
+- 공개 판단 상태
+- 공개 사유 코드
+- 선택적인 사용자용 설명
+- 선택적인 결과 무결성·출처 메타데이터
 
-It must not expose:
+다음 내용은 공개하지 않습니다.
 
-- internal state snapshots,
-- internal policy identifiers,
-- rule evaluation traces,
-- hidden scores,
-- internal branch or rollback data,
-- intermediate reasoning,
-- proprietary component topology.
+- 내부 상태 스냅샷
+- 내부 정책 식별자
+- 규칙 평가 과정
+- 숨겨진 점수
+- 내부 분기·복구 정보
+- 중간 추론 과정
+- 비공개 구성요소 간 연결 구조
 
-## 6. Public simulator independence
+## 6. 공개 시뮬레이터의 독립성
 
-The simulator in this repository is benchmark infrastructure. Its state model must be designed for the scenario itself and must not mirror a proprietary controller's internal state model.
+이 저장소의 시뮬레이터는 벤치마크를 위한 독립적인 공개 인프라입니다.
 
-Similarity of purpose is not enough to justify copying internal structures.
+시뮬레이터의 상태 모델은 각 공개 시나리오를 설명하기 위해 별도로 설계하며, 비공개 핵심 시스템의 내부 상태 구조를 그대로 복제하지 않습니다.
 
-## 7. Publication workflow
+목적이 비슷하다는 이유만으로 내부 구조를 가져오지 않습니다.
 
-For every change intended for `main`:
+## 7. 공개 작업 절차
 
-1. Build or edit only inside this public repository.
-2. Do not cherry-pick, merge, import, or copy Git objects from a private repository.
-3. Run secret and credential scans.
-4. Run internal-name scans using a deny-list stored outside this repository.
-5. Perform semantic IP review against this document.
-6. Inspect the complete diff, including tests, fixtures, comments, documentation, and commit messages.
-7. Publish only after the public surface can stand on its own without explaining proprietary internals.
+`main`에 반영되는 모든 변경은 다음 절차를 따릅니다.
 
-## 8. Default decision
+1. 공개할 코드는 이 공개 저장소 안에서 새로 작성하거나 수정합니다.
+2. 비공개 저장소의 Git 객체를 cherry-pick, merge, import, 복사하지 않습니다.
+3. 비밀정보와 자격증명 검사를 수행합니다.
+4. 비공개 저장소 밖에서 관리되는 내부 명칭 차단 목록으로 별도 검사합니다.
+5. 이 문서를 기준으로 의미 단위의 기술 유출 가능성을 검토합니다.
+6. 코드뿐 아니라 테스트, 예제, 문서, 주석, 커밋 메시지까지 전체 diff를 확인합니다.
+7. 공개 자료만으로 독립적으로 이해할 수 있으면서 비공개 내부 구현을 설명하지 않을 때만 반영합니다.
 
-When uncertain whether a detail belongs here, omit it from the public repository and keep the boundary narrower.
+## 8. 애매하면 공개하지 않는다
 
-The Arena should be inspectable. A proprietary controller does not need to be.
+어떤 세부사항이 공개 범위에 들어가는지 확실하지 않다면 우선 제외합니다.
+
+**Arena는 외부에서 검증 가능해야 하지만, 핵심 기술의 내부 구현까지 외부에서 관찰 가능할 필요는 없습니다.**
