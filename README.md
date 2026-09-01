@@ -10,7 +10,7 @@ SEA Ops Arena는 **AI가 실제 운영 환경에 영향을 주는 행동을 제�
 
 - JSON 기반 공개 시나리오 묶음 실행
 - JSON 기반 공개 판단 결과 입력
-- 동일한 시나리오에 서로 다른 결과를 넣어 비교
+- 동일한 시나리오에 여러 결과를 넣어 한 표에서 비교
 - 실행 여부와 합성 환경 결과 기록
 - 판단 일치율 집계
 - 불필요 실행 횟수 집계
@@ -19,6 +19,8 @@ SEA Ops Arena는 **AI가 실제 운영 환경에 영향을 주는 행동을 제�
 - 한국어 Markdown 또는 JSON 결과 출력
 - 입력 파일 SHA-256 기반의 재현 가능한 실행 식별자 생성
 - `manifest.json` + `report.md` + `results.json` 결과 묶음 저장
+- 판단 결과 파일의 누락·불필요 ID 사전 검증
+- 허용된 필드만 받는 외부 결과용 공개 포맷
 - GitHub Actions를 통한 공개 테스트 자동 검증
 
 현재 포함된 결과는 **실제 AI 모델이나 SEA의 성능 결과가 아닙니다.** Arena의 실행·비교·재현 방식을 보여 주기 위해 만든 합성 시나리오와 고정 응답입니다.
@@ -52,13 +54,20 @@ sea-ops-arena \
   --decisions examples/decisions/v2-balanced.json
 ```
 
-같은 시나리오에 모든 요청을 진행하는 고정 예시를 넣어 비교할 수도 있습니다.
+## 여러 결과를 한 번에 비교
+
+같은 12개 시나리오에 세 가지 고정 예시 결과를 적용해 공개 지표를 나란히 볼 수 있습니다.
 
 ```bash
-sea-ops-arena \
+sea-ops-arena-compare \
   --suite examples/scenarios/public_suite_v2.json \
-  --decisions examples/decisions/v2-eager.json
+  --decisions \
+    examples/decisions/v2-balanced.json \
+    examples/decisions/v2-eager.json \
+    examples/decisions/v2-cautious.json
 ```
+
+Arena는 임의의 가중 종합점수나 순위를 만들지 않고 원래 관찰값을 그대로 비교합니다. 예시 결과는 [`examples/V2_COMPARISON.md`](examples/V2_COMPARISON.md)에서 볼 수 있습니다.
 
 ## 재현 가능한 공개 결과 묶음
 
@@ -78,6 +87,18 @@ sea-ops-arena \
 - `results.json` — 후속 분석용 구조화 결과
 
 같은 시나리오 파일과 같은 판단 결과 파일을 사용하면 같은 `run_id`가 생성됩니다. manifest에는 호스트명, 환경변수, 내부 시스템 경로 또는 비공개 판단 과정은 기록하지 않습니다.
+
+## 외부 결과를 공개할 때
+
+실제 외부 모델·사람·외부 시스템의 결과를 저장할 때는 `public-decision-set-v1` 형식을 사용할 수 있습니다.
+
+```bash
+sea-ops-arena \
+  --suite examples/scenarios/public_suite_v2.json \
+  --decisions examples/results/v2-balanced.public.json
+```
+
+이 형식은 **허용된 필드만 통과**합니다. 임의 metadata나 원본 프롬프트·로그 등을 파일에 추가하면 로더가 거부합니다. 실제 합성 예시는 `examples/results/v2-balanced.public.json`, 상세 규칙은 [`docs/PUBLIC_RESULTS.md`](docs/PUBLIC_RESULTS.md)에 있습니다.
 
 자세한 실행 방법은 [`docs/QUICKSTART.md`](docs/QUICKSTART.md), 평가 지표의 의미는 [`docs/EVALUATION.md`](docs/EVALUATION.md)를 참고해 주세요.
 
@@ -152,7 +173,7 @@ SEA Ops Arena는 이러한 차이를 외부에서도 검증할 수 있도록 **�
 
 ## 개발 로드맵
 
-현재 구현 범위와 이후의 공개 시나리오 확장, 실제 모델 결과 입력, 반복 비교, 공개 결과 시각화 계획은 [`docs/ROADMAP.md`](docs/ROADMAP.md)에 정리되어 있습니다.
+현재 구현 범위와 이후의 실제 외부 결과 입력, 반복 비교, 시나리오 확장, 공개 결과 시각화 계획은 [`docs/ROADMAP.md`](docs/ROADMAP.md)에 정리되어 있습니다.
 
 로드맵 역시 공개 Arena의 기능만 다루며 SEA 내부 개발 계획은 포함하지 않습니다.
 
