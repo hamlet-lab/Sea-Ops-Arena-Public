@@ -13,6 +13,7 @@ license = {text = "공개 소스 형태로 제공되며 별도의 라이선스 �
 sea-ops-arena = "sea_ops_arena.cli:main"
 sea-ops-arena-compare = "sea_ops_arena.compare_cli:main"
 sea-ops-arena-repeat = "sea_ops_arena.repeat_cli:main"
+sea-ops-arena-template = "sea_ops_arena.template_cli:main"
 sea-ops-arena-demo = "sea_ops_arena.demo:main"
 
 [tool.setuptools]
