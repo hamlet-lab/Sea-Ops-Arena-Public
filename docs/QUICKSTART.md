@@ -44,7 +44,23 @@ sea-ops-arena-compare \
 
 결과 예시는 [`../examples/V2_COMPARISON.md`](../examples/V2_COMPARISON.md)를 참고해 주세요.
 
-## 3. 서로 다른 응답 패턴을 개별 실행
+## 3. 외부 결과용 엄격 공개 포맷
+
+실제 외부 모델·사람·외부 시스템의 결과를 저장할 때는 허용 필드가 제한된 `public-decision-set-v1` 형식을 사용할 수 있습니다.
+
+저장소의 합성 예시를 그대로 실행하려면:
+
+```bash
+sea-ops-arena \
+  --suite examples/scenarios/public_suite_v2.json \
+  --decisions examples/results/v2-balanced.public.json
+```
+
+이 포맷은 `schema_version`, `label`, `source`, `decisions` 외의 최상위 필드를 허용하지 않습니다. `source` 역시 사전에 정한 최소 공개 필드만 허용합니다.
+
+허용되지 않은 임의 필드가 들어오면 실행 전에 오류가 발생합니다. 상세 규칙은 [`PUBLIC_RESULTS.md`](PUBLIC_RESULTS.md)를 참고해 주세요.
+
+## 4. 서로 다른 응답 패턴을 개별 실행
 
 ```bash
 sea-ops-arena \
@@ -60,7 +76,7 @@ sea-ops-arena \
 - `v2-eager`: 모든 요청을 진행하는 고정 예시
 - `v2-cautious`: 모든 요청을 보류하는 고정 예시
 
-## 4. 재현 가능한 실행 결과 묶음 저장
+## 5. 재현 가능한 실행 결과 묶음 저장
 
 `--output-dir`을 지정하면 입력 파일의 SHA-256 해시와 결과를 함께 저장합니다.
 
@@ -81,7 +97,7 @@ sea-ops-arena \
 
 manifest에는 호스트명, 환경변수, 내부 시스템 경로, 비공개 판단 과정 같은 정보가 포함되지 않습니다.
 
-## 5. JSON 결과를 표준 출력으로 보기
+## 6. JSON 결과를 표준 출력으로 보기
 
 ```bash
 sea-ops-arena \
@@ -90,7 +106,7 @@ sea-ops-arena \
   --format json
 ```
 
-## 6. 작은 v1 데모
+## 7. 작은 v1 데모
 
 처음 구조를 빠르게 살펴보고 싶다면 기존 3개 사례 데모도 유지합니다.
 
@@ -106,13 +122,13 @@ sea-ops-arena \
   --decisions examples/decisions/balanced.json
 ```
 
-## 7. 테스트
+## 8. 테스트
 
 ```bash
 python -m pytest
 ```
 
-테스트는 공개 하네스, 공개 입출력, 공개 지표, 결과 비교와 재현용 결과 묶음만 검증합니다. 비공개 의사결정 시스템의 내부 규칙이나 구조를 검증하지 않습니다.
+테스트는 공개 하네스, 공개 입출력, 공개 지표, 결과 비교, 결과 포맷과 재현용 결과 묶음만 검증합니다. 비공개 의사결정 시스템의 내부 규칙이나 구조를 검증하지 않습니다.
 
 GitHub Actions에서도 같은 공개 테스트를 자동 실행합니다.
 
