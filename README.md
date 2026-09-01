@@ -10,12 +10,13 @@ SEA Ops Arena는 **AI가 실제 운영 환경에 영향을 주는 행동을 제�
 
 - 동일한 형식의 실행 요청과 판단 결과 연결
 - 공개 합성 시나리오 묶음 실행
+- JSON 시나리오와 JSON 판단 결과 입력
 - 실행 여부와 합성 환경 결과 기록
 - 판단 일치율 집계
 - 불필요 실행과 필요한 실행 누락 집계
 - 실행 성공률 집계
 - 결과를 한국어 Markdown 또는 JSON으로 출력
-- 고정된 예시 응답을 사용한 재현 가능한 데모
+- GitHub Actions를 통한 공개 테스트 자동 검증
 
 현재 포함된 데모 결과는 **실제 AI 모델이나 SEA의 성능 결과가 아닙니다.** Arena가 어떤 방식으로 실험을 실행하고 결과를 정리하는지 보여 주기 위한 합성 예시입니다.
 
@@ -28,21 +29,25 @@ python -m pip install -e .
 python -m sea_ops_arena.demo
 ```
 
-서로 다른 고정 예시 응답을 비교하려면 다음과 같이 실행합니다.
+저장소에 포함된 공개 JSON 파일을 그대로 사용하려면:
 
 ```bash
-python -m sea_ops_arena.demo --profile balanced
-python -m sea_ops_arena.demo --profile eager
-python -m sea_ops_arena.demo --profile cautious
+sea-ops-arena \
+  --suite examples/scenarios/public_demo_v1.json \
+  --decisions examples/decisions/balanced.json
 ```
 
-JSON 결과가 필요하면:
+다른 고정 예시 응답과 비교할 수도 있습니다.
 
 ```bash
-python -m sea_ops_arena.demo --profile balanced --format json
+sea-ops-arena \
+  --suite examples/scenarios/public_demo_v1.json \
+  --decisions examples/decisions/eager.json
 ```
 
-자세한 실행 방법은 [`docs/QUICKSTART.md`](docs/QUICKSTART.md), 평가 지표의 의미는 [`docs/EVALUATION.md`](docs/EVALUATION.md)를 참고해 주세요.
+JSON 결과가 필요하면 `--format json`을 추가합니다.
+
+자세한 실행 방법은 [`docs/QUICKSTART.md`](docs/QUICKSTART.md), 평가 지표의 의미는 [`docs/EVALUATION.md`](docs/EVALUATION.md), 합성 결과 예시는 [`examples/DEMO_RESULTS.md`](examples/DEMO_RESULTS.md)를 참고해 주세요.
 
 ## 무엇을 공개하나
 
