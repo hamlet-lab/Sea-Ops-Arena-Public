@@ -4,6 +4,8 @@ SEA Ops Arena는 **AI가 실제 운영 환경에 영향을 주는 행동을 제�
 
 이 저장소에는 SEA의 내부 구현체가 아니라, 외부에서 확인하고 반복 실행할 수 있는 **Arena(검증 환경)**만 공개합니다.
 
+외부 심사·검토 목적으로 처음 방문했다면 [`docs/REVIEWER_GUIDE.md`](docs/REVIEWER_GUIDE.md)의 **3분 가이드**부터 보는 것을 권장합니다.
+
 ## 현재 공개판에서 할 수 있는 것
 
 현재 공개판은 4개 운영 영역의 **12개 합성 시나리오**를 동일한 형식으로 실행하고 비교할 수 있습니다.
@@ -23,6 +25,8 @@ SEA Ops Arena는 **AI가 실제 운영 환경에 영향을 주는 행동을 제�
 - 판단 결과 파일의 누락·불필요 ID 사전 검증
 - 실제 외부 결과와 시나리오 파일의 SHA-256 결합 검증
 - 허용된 필드만 받는 외부 결과용 공개 포맷
+- 안전한 공개 결과 템플릿 생성
+- 일반적인 공개 위험을 검사하는 릴리스 감사
 - GitHub Actions를 통한 테스트와 CLI 재현 경로 자동 검증
 
 현재 포함된 결과는 **실제 AI 모델이나 SEA의 성능 결과가 아닙니다.** Arena의 실행·비교·재현 방식을 보여 주기 위해 만든 합성 시나리오와 고정 응답입니다.
@@ -109,9 +113,36 @@ sea-ops-arena \
 
 실제 외부 모델·사람·외부 시스템의 결과를 저장할 때는 `public-decision-set-v1` 형식을 사용합니다.
 
+원본 로그를 복사한 뒤 삭제하는 방식보다 먼저 안전한 템플릿을 생성하는 방식을 권장합니다.
+
+```bash
+sea-ops-arena-template \
+  --suite examples/scenarios/public_suite_v2.json \
+  --output public-result.json \
+  --label example-model-run \
+  --kind model \
+  --model-name public-model-name \
+  --model-version public-version \
+  --repeat-id run-001
+```
+
+템플릿에는 정확한 시나리오 파일의 SHA-256과 request ID 목록, 공개 가능한 최소 출처 정보만 들어갑니다. 생성된 `__FILL__` 자리에 최종 `proceed` / `reject` / `defer` 값만 검토해 채웁니다.
+
 실제 외부 결과에는 해당 결과가 생성된 **정확한 공개 시나리오 파일의 SHA-256**을 `suite_sha256`으로 기록해야 합니다. 현재 시나리오 파일과 해시가 다르면 Arena는 평가를 거부합니다.
 
 이 형식은 **허용된 필드만 통과**합니다. 임의 metadata나 원본 프롬프트·시스템 메시지·로그·내부 trace 등을 파일에 추가하면 로더가 거부합니다. 합성 예시는 `examples/results/`, 상세 규칙은 [`docs/PUBLIC_RESULTS.md`](docs/PUBLIC_RESULTS.md)에 있습니다.
+
+## 공개 릴리스 감사
+
+일반적인 실수성 공개 위험은 다음 명령으로 확인할 수 있습니다.
+
+```bash
+sea-ops-arena-audit --root .
+```
+
+이 감사 도구는 `.env`, 키·인증서 형식, 공개 저장소에서 사용하지 않는 위험 경로, 엄격 공개 결과 포맷과 시나리오 해시 결합을 확인합니다.
+
+**내부 비밀명 deny-list는 이 공개 저장소에 넣지 않습니다.** 내부 명칭과 여러 파일을 조합했을 때의 역추론 위험은 저장소 밖에서 별도로 검토합니다. 자세한 범위와 한계는 [`docs/PUBLIC_AUDIT.md`](docs/PUBLIC_AUDIT.md)를 참고해 주세요.
 
 자세한 실행 방법은 [`docs/QUICKSTART.md`](docs/QUICKSTART.md), 평가 지표의 의미는 [`docs/EVALUATION.md`](docs/EVALUATION.md)를 참고해 주세요.
 
