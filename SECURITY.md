@@ -1,23 +1,21 @@
-# Security and Sensitive Disclosure
+# 보안 및 민감정보 제보 안내
 
-This repository is public. Do not use a public issue, pull request, discussion, or commit to report suspected proprietary implementation details, credentials, private infrastructure, unpublished research material, or confidential architecture information.
+이 저장소는 공개 저장소입니다. 비공개 기술 내용, 자격증명, 내부 인프라, 공개되지 않은 연구 자료, 비공개 아키텍처 정보 등이 포함되었다고 의심되는 경우 **공개 Issue, Pull Request, Discussion, Commit을 이용해 내용을 그대로 게시하지 말아 주세요.**
 
-If you believe you found sensitive material in this repository, contact the repository owner through an established private channel and include only the minimum information needed to identify the affected path or commit.
+민감한 내용이 발견되었다고 판단되면 저장소 소유자에게 기존의 비공개 연락 경로를 통해 알려 주세요. 이때 문제의 파일이나 커밋을 식별하는 데 필요한 최소한의 정보만 전달해 주세요.
 
-Do not reproduce sensitive content in a public report.
+민감한 원문을 공개 보고서에 다시 복제하지 말아 주세요.
 
-## Scope
+## 민감정보에 해당하는 예시
 
-Security-sensitive reports include:
+- API 키, 토큰 등 자격증명
+- 비공개 엔드포인트 또는 내부 인프라 정보
+- 고객 또는 사용자 데이터
+- 비공개 핵심 기술의 내부 구현 정보
+- 공개되지 않은 내부 명칭 또는 아키텍처 자료
+- 비공개 연구·특허 관련 자료
+- Git 이력에 실수로 남은 민감한 내용
 
-- credentials or tokens,
-- private endpoints or infrastructure details,
-- customer or user data,
-- proprietary controller internals,
-- unpublished internal names or architecture artifacts,
-- private research or patent material,
-- content accidentally retained in Git history.
+## 공개 Issue를 사용할 수 있는 경우
 
-## Public issues are for public Arena behavior
-
-Public issues may be used for reproducible bugs in the public benchmark harness, public schemas, public simulator fixtures, documentation, or scoring utilities when the report itself contains no confidential material.
+공개 벤치마크 하네스, 공개 스키마, 공개 시뮬레이터 예제, 문서, 평가 도구 등에서 재현 가능한 문제가 있고 제보 내용 자체에 비공개 정보가 포함되지 않는 경우에는 공개 Issue를 사용할 수 있습니다.
