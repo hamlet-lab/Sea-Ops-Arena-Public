@@ -5,9 +5,13 @@ from pathlib import Path
 
 import pytest
 
+from sea_ops_arena.artifacts import sha256_file
 from sea_ops_arena.io import load_decisions, load_suite
 from sea_ops_arena.public_results import load_public_decision_set
-from sea_ops_arena.validation import validate_decision_coverage
+from sea_ops_arena.validation import (
+    validate_decision_coverage,
+    validate_public_result_binding,
+)
 
 
 PUBLIC_RESULT = Path("examples/results/v2-balanced.public.json")
@@ -48,3 +52,31 @@ def test_unknown_source_field_is_rejected(tmp_path):
 
     with pytest.raises(ValueError, match="허용하지 않은 필드"):
         load_public_decision_set(path)
+
+
+def test_non_fixture_result_requires_suite_hash(tmp_path):
+    data = json.loads(PUBLIC_RESULT.read_text(encoding="utf-8"))
+    data["source"]["kind"] = "model"
+    data["source"]["model_name"] = "public-example-model"
+    data.pop("suite_sha256", None)
+    path = tmp_path / "model-result.json"
+    path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="suite_sha256"):
+        validate_public_result_binding(SUITE, path)
+
+
+def test_suite_hash_binding_accepts_exact_suite_and_rejects_mismatch(tmp_path):
+    data = json.loads(PUBLIC_RESULT.read_text(encoding="utf-8"))
+    data["source"]["kind"] = "model"
+    data["source"]["model_name"] = "public-example-model"
+    data["suite_sha256"] = sha256_file(SUITE)
+    path = tmp_path / "model-result.json"
+    path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+
+    validate_public_result_binding(SUITE, path)
+
+    data["suite_sha256"] = "0" * 64
+    path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    with pytest.raises(ValueError, match="일치하지 않습니다"):
+        validate_public_result_binding(SUITE, path)
