@@ -7,7 +7,7 @@ from .benchmark import run_suite
 from .fixtures import ScriptedController, SyntheticEnvironment
 from .io import load_decisions, load_suite
 from .reporting import to_json, to_markdown
-from .validation import validate_decision_coverage
+from .validation import validate_decision_coverage, validate_public_result_binding
 
 
 def main() -> None:
@@ -28,6 +28,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    validate_public_result_binding(args.suite, args.decisions)
     suite = load_suite(args.suite)
     decisions = load_decisions(args.decisions)
     validate_decision_coverage(suite, decisions)
