@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -9,7 +10,7 @@ from .contracts import DecisionStatus
 
 
 PUBLIC_RESULT_SCHEMA_VERSION = "public-decision-set-v1"
-_ALLOWED_TOP_LEVEL = {"schema_version", "label", "source", "decisions"}
+_ALLOWED_TOP_LEVEL = {"schema_version", "label", "suite_sha256", "source", "decisions"}
 _ALLOWED_SOURCE_FIELDS = {
     "kind",
     "model_name",
@@ -18,6 +19,7 @@ _ALLOWED_SOURCE_FIELDS = {
     "repeat_id",
 }
 _ALLOWED_SOURCE_KINDS = {"fixture", "model", "human", "external-system"}
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 @dataclass(frozen=True)
@@ -33,6 +35,7 @@ class PublicResultSource:
 class PublicDecisionSet:
     schema_version: str
     label: str
+    suite_sha256: str | None
     source: PublicResultSource
     decisions: dict[str, DecisionStatus]
 
@@ -69,6 +72,11 @@ def load_public_decision_set(path: str | Path) -> PublicDecisionSet:
     if not isinstance(label, str) or not label.strip():
         raise ValueError("label은 비어 있지 않은 문자열이어야 합니다")
 
+    suite_sha256 = raw.get("suite_sha256")
+    if suite_sha256 is not None:
+        if not isinstance(suite_sha256, str) or not _SHA256_RE.fullmatch(suite_sha256):
+            raise ValueError("suite_sha256은 소문자 64자리 SHA-256 문자열이어야 합니다")
+
     raw_source = raw.get("source")
     if not isinstance(raw_source, dict):
         raise ValueError("source 객체가 필요합니다")
@@ -102,6 +110,7 @@ def load_public_decision_set(path: str | Path) -> PublicDecisionSet:
     return PublicDecisionSet(
         schema_version=schema_version,
         label=label,
+        suite_sha256=suite_sha256,
         source=PublicResultSource(
             kind=str(kind),
             model_name=optional_text("model_name"),
