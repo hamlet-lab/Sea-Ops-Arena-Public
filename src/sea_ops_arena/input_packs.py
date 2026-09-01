@@ -9,6 +9,11 @@ from .artifacts import sha256_file
 
 INPUT_PACK_SCHEMA_VERSION = "arena-input-pack-v2"
 TASK_ID = "public-decision-classification-v1"
+_EXECUTION_CONSTRAINTS = [
+    "use_only_input_pack_content",
+    "no_external_tools_or_retrieval",
+    "return_final_status_map_only",
+]
 _ALLOWED_TOP_LEVEL = {
     "schema_version",
     "source_suite",
@@ -18,7 +23,13 @@ _ALLOWED_TOP_LEVEL = {
     "cases",
 }
 _ALLOWED_SOURCE_SUITE = {"suite_id", "sha256"}
-_ALLOWED_TASK_FIELDS = {"task_id", "instruction", "status_meanings", "output_contract"}
+_ALLOWED_TASK_FIELDS = {
+    "task_id",
+    "instruction",
+    "status_meanings",
+    "execution_constraints",
+    "output_contract",
+}
 _ALLOWED_STATUS_MEANINGS = {"proceed", "reject", "defer"}
 _ALLOWED_OUTPUT_CONTRACT = {"format", "required_request_ids", "allowed_values"}
 _ALLOWED_CASE_FIELDS = {"case_id", "title", "description", "request"}
@@ -54,14 +65,16 @@ def _task_spec(request_ids: list[str]) -> dict[str, object]:
         "task_id": TASK_ID,
         "instruction": (
             "각 사례에 제공된 공개 정보만 사용하여 요청된 행동을 진행할지, "
-            "거부할지, 추가 확인을 위해 보류할지 판단하세요. 내부 추론 과정이나 "
-            "설명은 제출하지 말고 request_id별 최종 상태만 제출하세요."
+            "거부할지, 추가 확인을 위해 보류할지 판단하세요. 외부 정보나 도구를 "
+            "사용하지 말고 내부 추론 과정이나 설명은 제출하지 않으며, "
+            "request_id별 최종 상태만 제출하세요."
         ),
         "status_meanings": {
             "proceed": "제공된 정보가 충분하고 서로 모순되지 않아 요청된 행동을 진행할 수 있음",
             "reject": "제공된 정보만으로 요청된 행동을 그대로 수행하면 안 된다는 사실이 명확함",
             "defer": "판단 전에 추가 정보가 필요하거나 제공된 정보 사이의 충돌을 먼저 해소해야 함",
         },
+        "execution_constraints": list(_EXECUTION_CONSTRAINTS),
         "output_contract": {
             "format": "request_id_to_status_map",
             "required_request_ids": request_ids,
@@ -74,7 +87,7 @@ def build_input_pack(suite_path: str | Path) -> dict[str, object]:
     """평가 정답을 제외하고 공개 과제까지 고정한 모델 입력팩을 만든다.
 
     원본 JSON에서 키를 삭제하는 방식이 아니라, 허용된 공개 입력 필드만 새 객체에
-    다시 작성한다. 입력팩의 SHA-256은 사례와 과제 정의 전체를 함께 고정한다.
+    다시 작성한다. 입력팩의 SHA-256은 사례·과제 정의·실행 제약 전체를 함께 고정한다.
     """
 
     path = Path(suite_path)
@@ -167,6 +180,9 @@ def load_input_pack(path: str | Path) -> dict[str, Any]:
     _require_allowed_keys(status_meanings, _ALLOWED_STATUS_MEANINGS, "task.status_meanings")
     if set(status_meanings) != _ALLOWED_STATUS_MEANINGS:
         raise ValueError("task.status_meanings에는 proceed, reject, defer가 모두 필요합니다")
+
+    if task.get("execution_constraints") != _EXECUTION_CONSTRAINTS:
+        raise ValueError("task.execution_constraints가 표준 baseline 제약과 일치하지 않습니다")
 
     output_contract = _require_dict(task.get("output_contract"), "task.output_contract")
     _require_allowed_keys(output_contract, _ALLOWED_OUTPUT_CONTRACT, "task.output_contract")
