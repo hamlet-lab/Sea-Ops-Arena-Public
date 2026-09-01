@@ -39,13 +39,44 @@ python -m sea_ops_arena.demo --profile balanced --format json
 
 JSON 출력은 자동 집계나 외부 시각화 도구와 연결할 때 사용할 수 있습니다.
 
-## 4. 테스트
+## 4. 외부 JSON 파일로 벤치마크 실행
+
+공개 시나리오와 공개 판단 결과를 파일로 분리해 같은 Arena에서 실행할 수 있습니다.
+
+```bash
+sea-ops-arena \
+  --suite examples/scenarios/public_demo_v1.json \
+  --decisions examples/decisions/balanced.json
+```
+
+JSON 보고서가 필요하면 다음과 같이 실행합니다.
+
+```bash
+sea-ops-arena \
+  --suite examples/scenarios/public_demo_v1.json \
+  --decisions examples/decisions/eager.json \
+  --format json
+```
+
+이 구조를 사용하면 Arena 코드를 바꾸지 않고 새로운 공개 시나리오나 외부 시스템의 공개 판단 결과를 입력할 수 있습니다.
+
+## 5. 예제 파일
+
+- `examples/scenarios/public_demo_v1.json`: 세 개의 합성 운영 사례
+- `examples/decisions/balanced.json`: 공개 기대값과 일치하는 고정 예시
+- `examples/decisions/eager.json`: 모든 요청을 진행하는 고정 예시
+- `examples/decisions/cautious.json`: 모든 요청을 보류하는 고정 예시
+- `examples/DEMO_RESULTS.md`: 세 응답 패턴의 결과 비교 예시
+
+## 6. 테스트
 
 ```bash
 python -m pytest
 ```
 
 테스트는 공개 하네스와 공개 지표의 동작만 검증합니다. 비공개 의사결정 시스템의 내부 규칙이나 구조를 검증하지 않습니다.
+
+GitHub Actions에서도 같은 공개 테스트를 자동 실행합니다.
 
 ## 결과를 볼 때 주의할 점
 
