@@ -14,6 +14,7 @@ sea-ops-arena = "sea_ops_arena.cli:main"
 sea-ops-arena-compare = "sea_ops_arena.compare_cli:main"
 sea-ops-arena-repeat = "sea_ops_arena.repeat_cli:main"
 sea-ops-arena-template = "sea_ops_arena.template_cli:main"
+sea-ops-arena-audit = "sea_ops_arena.audit_cli:main"
 sea-ops-arena-demo = "sea_ops_arena.demo:main"
 
 [tool.setuptools]
