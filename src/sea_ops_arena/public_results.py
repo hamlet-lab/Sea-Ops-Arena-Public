@@ -10,7 +10,14 @@ from .contracts import DecisionStatus
 
 
 PUBLIC_RESULT_SCHEMA_VERSION = "public-decision-set-v1"
-_ALLOWED_TOP_LEVEL = {"schema_version", "label", "suite_sha256", "source", "decisions"}
+_ALLOWED_TOP_LEVEL = {
+    "schema_version",
+    "label",
+    "suite_sha256",
+    "input_pack_sha256",
+    "source",
+    "decisions",
+}
 _ALLOWED_SOURCE_FIELDS = {
     "kind",
     "model_name",
@@ -36,6 +43,7 @@ class PublicDecisionSet:
     schema_version: str
     label: str
     suite_sha256: str | None
+    input_pack_sha256: str | None
     source: PublicResultSource
     decisions: dict[str, DecisionStatus]
 
@@ -47,6 +55,15 @@ def _require_allowed_keys(data: dict[str, Any], allowed: set[str], location: str
             f"{location}에 공개 포맷에서 허용하지 않은 필드가 있습니다: "
             + ", ".join(unexpected)
         )
+
+
+def _optional_sha256(raw: dict[str, Any], name: str) -> str | None:
+    value = raw.get(name)
+    if value is None:
+        return None
+    if not isinstance(value, str) or not _SHA256_RE.fullmatch(value):
+        raise ValueError(f"{name}은 소문자 64자리 SHA-256 문자열이어야 합니다")
+    return value
 
 
 def load_public_decision_set(path: str | Path) -> PublicDecisionSet:
@@ -72,10 +89,8 @@ def load_public_decision_set(path: str | Path) -> PublicDecisionSet:
     if not isinstance(label, str) or not label.strip():
         raise ValueError("label은 비어 있지 않은 문자열이어야 합니다")
 
-    suite_sha256 = raw.get("suite_sha256")
-    if suite_sha256 is not None:
-        if not isinstance(suite_sha256, str) or not _SHA256_RE.fullmatch(suite_sha256):
-            raise ValueError("suite_sha256은 소문자 64자리 SHA-256 문자열이어야 합니다")
+    suite_sha256 = _optional_sha256(raw, "suite_sha256")
+    input_pack_sha256 = _optional_sha256(raw, "input_pack_sha256")
 
     raw_source = raw.get("source")
     if not isinstance(raw_source, dict):
@@ -111,6 +126,7 @@ def load_public_decision_set(path: str | Path) -> PublicDecisionSet:
         schema_version=schema_version,
         label=label,
         suite_sha256=suite_sha256,
+        input_pack_sha256=input_pack_sha256,
         source=PublicResultSource(
             kind=str(kind),
             model_name=optional_text("model_name"),
