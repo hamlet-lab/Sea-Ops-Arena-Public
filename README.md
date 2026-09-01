@@ -1,57 +1,67 @@
 # SEA Ops Arena
 
-SEA Ops Arena is a public benchmark and evaluation harness for testing whether AI-generated operational proposals remain safe when they interact with a simulated or controlled environment.
+SEA Ops Arena는 **AI가 실제 운영 환경에 영향을 주는 행동을 제안할 때, 그 행동을 안전하고 재현 가능한 방식으로 검증하기 위한 공개 벤치마크·평가 환경**입니다.
 
-This repository contains the **Arena**, not the implementation of SEA.
+이 저장소에는 SEA의 내부 구현체가 아니라, 외부에서 확인하고 재현할 수 있는 **Arena(검증 환경)**만 공개합니다.
 
-## What is public here
+## 무엇을 공개하나
 
-The public surface is intentionally small:
+이 저장소의 공개 범위는 의도적으로 제한되어 있습니다.
 
-- scenario and benchmark formats,
-- model-output adapters,
-- a generic controller interface,
-- public decision receipts,
-- simulator-facing execution results,
-- scoring and reproducibility utilities.
+- 시나리오 및 벤치마크 형식
+- AI/에이전트 출력 연결용 어댑터
+- 외부 의사결정 시스템과 연결되는 공통 인터페이스
+- 공개 가능한 판단 결과 형식
+- 시뮬레이터 실행 결과
+- 점수화 및 재현성 도구
 
-A controller may be local, remote, human-operated, rule-based, or proprietary. The Arena does not need to know how a controller reaches its decision.
+Arena는 연결된 의사결정 시스템이 내부에서 어떤 방식으로 판단하는지 알 필요가 없습니다. 로컬 시스템, 원격 시스템, 사람의 판단, 규칙 기반 시스템, 비공개 시스템 등 다양한 방식과 동일한 공개 인터페이스로 연결할 수 있습니다.
 
 ```text
-Model / Agent
-     |
-     v
-Execution Request
-     |
-     v
-Controller Adapter  <---- opaque boundary
-     |
-     v
-Decision Receipt
-     |
-     v
-Public Simulator
-     |
-     v
-Score / Evidence Bundle
+AI 모델 / 에이전트
+        |
+        v
+    실행 요청
+        |
+        v
+ 외부 시스템 연결부   <---- 내부 구현 비공개
+        |
+        v
+    판단 결과
+        |
+        v
+  공개 시뮬레이터
+        |
+        v
+ 평가 결과 / 근거 묶음
 ```
 
-## What is deliberately not public
+## 무엇을 공개하지 않나
 
-This repository does **not** publish proprietary controller internals, internal state representations, policy logic, governance logic, hidden evaluation criteria, private architecture documents, research artifacts, or production integration details.
+이 저장소는 다음 내용을 공개하지 않습니다.
 
-The public contract ends at the request/receipt boundary.
+- SEA 내부 구현 코드
+- 내부 상태 표현 방식
+- 비공개 정책·판단·권한 처리 로직
+- 내부 평가 기준
+- 비공개 아키텍처 문서
+- 연구·특허 관련 비공개 자료
+- 실제 운영 환경의 연결 정보 및 내부 시스템 정보
 
-See [`docs/PUBLIC_BOUNDARY.md`](docs/PUBLIC_BOUNDARY.md) before adding code or documentation.
+공개 범위는 **요청과 결과가 오가는 외부 인터페이스까지**입니다.
 
-## Repository status
+세부 공개 원칙은 [`docs/PUBLIC_BOUNDARY.md`](docs/PUBLIC_BOUNDARY.md)를 참고해 주세요.
 
-This repository starts from a new Git history and is maintained as a public-only codebase. It does not inherit the history of any private development repository.
+## 왜 공개하나
 
-## Intended use
+운영형 AI를 평가하려면 단순히 답변의 문장 품질만 보는 것으로는 부족합니다. 어떤 행동을 제안했고, 그 결과가 무엇이었으며, 같은 조건에서 다시 검증할 수 있는지가 중요합니다.
 
-SEA Ops Arena is intended for reproducible evaluation of operational AI behavior. Public benchmark code should make experiments inspectable without making a proprietary decision system inspectable.
+SEA Ops Arena는 이러한 실험을 외부에서도 확인할 수 있도록 **시나리오·실행·결과·평가의 공개 표면**을 제공합니다. 동시에 핵심 기술의 내부 구현은 공개 범위와 분리합니다.
 
-## Security and disclosure
+## 저장소 운영 원칙
 
-Do not report or submit suspected proprietary implementation details through a public issue. See [`SECURITY.md`](SECURITY.md).
+이 저장소는 공개 전용 코드베이스이며, 비공개 개발 저장소의 Git 이력을 상속하지 않습니다. 공개할 수 있는 내용만 이 저장소 안에서 별도로 작성하고 관리합니다.
+
+## 보안 및 민감정보 제보
+
+비공개 기술 내용이나 민감정보가 실수로 포함되었다고 판단되는 경우 공개 Issue, Pull Request, Discussion 등에 내용을 그대로 게시하지 말아 주세요. 자세한 안내는 [`SECURITY.md`](SECURITY.md)를 참고해 주세요.
