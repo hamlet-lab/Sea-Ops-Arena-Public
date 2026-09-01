@@ -10,6 +10,7 @@ requires-python = ">=3.11"
 license = {text = "공개 소스 형태로 제공되며 별도의 라이선스 권리를 부여하지 않음"}
 
 [project.scripts]
+sea-ops-arena = "sea_ops_arena.cli:main"
 sea-ops-arena-demo = "sea_ops_arena.demo:main"
 
 [tool.setuptools]
