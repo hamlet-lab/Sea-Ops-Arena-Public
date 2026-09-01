@@ -56,3 +56,13 @@ jobs:
               examples/results/v2-repeat-002.public.json \
               examples/results/v2-repeat-003.public.json \
             > /tmp/arena-repeat.md
+
+      - name: 공개 결과 템플릿 CLI 확인
+        run: |
+          sea-ops-arena-template \
+            --suite examples/scenarios/public_suite_v2.json \
+            --output /tmp/public-result-template.json \
+            --label smoke-test \
+            --kind model \
+            --model-name public-example-model \
+            --repeat-id smoke-001
