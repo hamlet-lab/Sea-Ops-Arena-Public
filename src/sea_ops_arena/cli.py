@@ -14,8 +14,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="공개 시나리오와 공개 판단 결과 파일을 SEA Ops Arena에서 실행합니다."
     )
-    parser.add_argument("--suite", required=True, help="공개 시나리오 JSON 파일")
+    parser.add_argument("--suite", required=True, help="평가용 공개 시나리오 JSON 파일")
     parser.add_argument("--decisions", required=True, help="요청별 공개 판단 결과 JSON 파일")
+    parser.add_argument(
+        "--input-pack",
+        help="실제 외부 결과가 생성될 때 모델·사람·외부 시스템이 본 정답 비노출 입력팩",
+    )
     parser.add_argument(
         "--format",
         choices=("markdown", "json"),
@@ -28,7 +32,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    validate_public_result_binding(args.suite, args.decisions)
+    validate_public_result_binding(args.suite, args.decisions, args.input_pack)
     suite = load_suite(args.suite)
     decisions = load_decisions(args.decisions)
     validate_decision_coverage(suite, decisions)
