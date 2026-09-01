@@ -33,6 +33,12 @@ jobs:
       - name: 공개 릴리스 감사
         run: sea-ops-arena-audit --root .
 
+      - name: 정답 비노출 입력팩 생성
+        run: |
+          sea-ops-arena-input-pack \
+            --suite examples/scenarios/public_suite_v2.json \
+            --output /tmp/model-input.json
+
       - name: 단일 평가 CLI 확인
         run: |
           sea-ops-arena \
@@ -64,6 +70,7 @@ jobs:
         run: |
           sea-ops-arena-template \
             --suite examples/scenarios/public_suite_v2.json \
+            --input-pack /tmp/model-input.json \
             --output /tmp/public-result-template.json \
             --label smoke-test \
             --kind model \
