@@ -22,9 +22,29 @@ sea-ops-arena \
 
 `v2-balanced`는 공개 기대값과 동일하게 준비한 고정 예시이며 실제 모델 또는 SEA 성능이 아닙니다.
 
-## 2. 서로 다른 응답 패턴 비교
+## 2. 여러 결과를 한 번에 비교
 
-같은 12개 시나리오에 다른 고정 결과를 넣어 Arena가 차이를 어떻게 집계하는지 확인할 수 있습니다.
+같은 시나리오에 여러 판단 결과 파일을 적용하고 공개 지표를 한 표에서 비교할 수 있습니다.
+
+```bash
+sea-ops-arena-compare \
+  --suite examples/scenarios/public_suite_v2.json \
+  --decisions \
+    examples/decisions/v2-balanced.json \
+    examples/decisions/v2-eager.json \
+    examples/decisions/v2-cautious.json
+```
+
+비교 도구는 임의의 가중 종합점수나 순위를 만들지 않고 다음 관찰값을 나란히 보여 줍니다.
+
+- 판단 일치율
+- 불필요 실행
+- 필요한 실행 누락
+- 실행 성공률
+
+결과 예시는 [`../examples/V2_COMPARISON.md`](../examples/V2_COMPARISON.md)를 참고해 주세요.
+
+## 3. 서로 다른 응답 패턴을 개별 실행
 
 ```bash
 sea-ops-arena \
@@ -40,7 +60,7 @@ sea-ops-arena \
 - `v2-eager`: 모든 요청을 진행하는 고정 예시
 - `v2-cautious`: 모든 요청을 보류하는 고정 예시
 
-## 3. 재현 가능한 실행 결과 묶음 저장
+## 4. 재현 가능한 실행 결과 묶음 저장
 
 `--output-dir`을 지정하면 입력 파일의 SHA-256 해시와 결과를 함께 저장합니다.
 
@@ -61,7 +81,7 @@ sea-ops-arena \
 
 manifest에는 호스트명, 환경변수, 내부 시스템 경로, 비공개 판단 과정 같은 정보가 포함되지 않습니다.
 
-## 4. JSON 결과를 표준 출력으로 보기
+## 5. JSON 결과를 표준 출력으로 보기
 
 ```bash
 sea-ops-arena \
@@ -70,7 +90,7 @@ sea-ops-arena \
   --format json
 ```
 
-## 5. 작은 v1 데모
+## 6. 작은 v1 데모
 
 처음 구조를 빠르게 살펴보고 싶다면 기존 3개 사례 데모도 유지합니다.
 
@@ -86,13 +106,13 @@ sea-ops-arena \
   --decisions examples/decisions/balanced.json
 ```
 
-## 6. 테스트
+## 7. 테스트
 
 ```bash
 python -m pytest
 ```
 
-테스트는 공개 하네스, 공개 입출력, 공개 지표와 재현용 결과 묶음만 검증합니다. 비공개 의사결정 시스템의 내부 규칙이나 구조를 검증하지 않습니다.
+테스트는 공개 하네스, 공개 입출력, 공개 지표, 결과 비교와 재현용 결과 묶음만 검증합니다. 비공개 의사결정 시스템의 내부 규칙이나 구조를 검증하지 않습니다.
 
 GitHub Actions에서도 같은 공개 테스트를 자동 실행합니다.
 
