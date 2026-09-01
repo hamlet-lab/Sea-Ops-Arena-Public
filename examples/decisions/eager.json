@@ -1,0 +1,10 @@
+{
+  "profile": "eager",
+  "kind": "synthetic",
+  "description": "모든 요청을 진행하도록 미리 정한 합성 응답",
+  "decisions": {
+    "req-customer-return": "proceed",
+    "req-office-purchase": "proceed",
+    "req-inventory-restock": "proceed"
+  }
+}
