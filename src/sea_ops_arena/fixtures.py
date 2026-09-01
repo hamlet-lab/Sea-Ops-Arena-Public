@@ -16,7 +16,10 @@ class ScriptedController:
         self._decisions = dict(decisions)
 
     def evaluate(self, request: ExecutionRequest) -> DecisionReceipt:
-        status = self._decisions.get(request.request_id, DecisionStatus.DEFER)
+        if request.request_id not in self._decisions:
+            raise KeyError(f"판단 결과가 없는 request_id: {request.request_id}")
+
+        status = self._decisions[request.request_id]
         return DecisionReceipt(
             decision_id=f"fixture-{request.request_id}",
             request_id=request.request_id,
