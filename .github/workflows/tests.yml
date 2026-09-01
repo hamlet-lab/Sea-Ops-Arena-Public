@@ -29,3 +29,30 @@ jobs:
 
       - name: 공개 테스트 실행
         run: python -m pytest -q
+
+      - name: 단일 평가 CLI 확인
+        run: |
+          sea-ops-arena \
+            --suite examples/scenarios/public_suite_v2.json \
+            --decisions examples/results/v2-balanced.public.json \
+            --format json > /tmp/arena-result.json
+
+      - name: 비교 CLI 확인
+        run: |
+          sea-ops-arena-compare \
+            --suite examples/scenarios/public_suite_v2.json \
+            --decisions \
+              examples/decisions/v2-balanced.json \
+              examples/decisions/v2-eager.json \
+              examples/decisions/v2-cautious.json \
+            > /tmp/arena-comparison.md
+
+      - name: 반복 평가 CLI 확인
+        run: |
+          sea-ops-arena-repeat \
+            --suite examples/scenarios/public_suite_v2.json \
+            --results \
+              examples/results/v2-balanced.public.json \
+              examples/results/v2-repeat-002.public.json \
+              examples/results/v2-repeat-003.public.json \
+            > /tmp/arena-repeat.md
