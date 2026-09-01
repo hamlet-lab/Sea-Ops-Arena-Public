@@ -7,6 +7,7 @@ from .benchmark import run_suite
 from .fixtures import ScriptedController, SyntheticEnvironment
 from .io import load_decisions, load_suite
 from .reporting import to_json, to_markdown
+from .validation import validate_decision_coverage
 
 
 def main() -> None:
@@ -29,6 +30,8 @@ def main() -> None:
 
     suite = load_suite(args.suite)
     decisions = load_decisions(args.decisions)
+    validate_decision_coverage(suite, decisions)
+
     environment = SyntheticEnvironment(
         outcomes={case.request.request_id: case.environment_status for case in suite.cases}
     )
