@@ -1,41 +1,41 @@
-# Public Release Checklist
+# 공개 릴리스 체크리스트
 
-Use this checklist before merging or publishing any substantive change.
+중요한 변경을 병합하거나 외부에 공개하기 전에 아래 항목을 확인합니다.
 
-## Repository origin
+## 저장소 출처
 
-- [ ] The change was authored in this public repository.
-- [ ] No private commit, branch, tag, tree, patch, or blob was imported.
-- [ ] No private repository history was merged, rebased, cherry-picked, or force-pushed here.
+- [ ] 변경 내용은 이 공개 저장소 안에서 작성되었다.
+- [ ] 비공개 커밋, 브랜치, 태그, 트리, 패치, blob을 가져오지 않았다.
+- [ ] 비공개 저장소의 이력을 merge, rebase, cherry-pick, force-push 방식으로 연결하지 않았다.
 
-## Content boundary
+## 공개 범위
 
-- [ ] The change exposes only public Arena inputs, outputs, scenarios, simulator behavior, or scoring.
-- [ ] Proprietary controller implementation remains behind `ControllerAdapter`.
-- [ ] No internal state representation is mirrored in public benchmark types.
-- [ ] No proprietary policy/governance/admission/commit logic is present.
-- [ ] No private architecture, research, patent, or invention material is present.
-- [ ] No confidential invariant is disclosed through a test, fixture, example, error message, diagram, or comment.
+- [ ] 공개되는 내용은 Arena의 입력, 출력, 시나리오, 시뮬레이터 동작 또는 평가에 한정된다.
+- [ ] 비공개 핵심 구현은 `ControllerAdapter` 뒤쪽에 남아 있다.
+- [ ] 공개 벤치마크 타입이 비공개 내부 상태 구조를 그대로 모사하지 않는다.
+- [ ] 비공개 정책·권한·판단·변경 반영 로직이 포함되어 있지 않다.
+- [ ] 비공개 아키텍처, 연구, 특허, 발명 자료가 포함되어 있지 않다.
+- [ ] 테스트, 예제, 오류 메시지, 다이어그램, 주석을 통해 내부 불변조건이나 설계가 역으로 드러나지 않는다.
 
-## Sensitive material
+## 민감정보
 
-- [ ] Secret/credential scan is clean.
-- [ ] Private internal-name scan is clean. The deny-list used for this scan is stored outside this repository.
-- [ ] No production endpoint, customer data, raw private trace, prompt corpus, or infrastructure secret is present.
+- [ ] 비밀정보·자격증명 검사 결과가 깨끗하다.
+- [ ] 내부 명칭 검사 결과가 깨끗하다. 검사에 사용하는 차단 목록은 이 저장소 밖에서 관리한다.
+- [ ] 실제 운영 엔드포인트, 고객 데이터, 비공개 로그, 프롬프트 원본, 인프라 비밀정보가 포함되어 있지 않다.
 
-## Semantic review
+## 의미 단위 검토
 
-- [ ] A reviewer considered whether multiple harmless-looking files could be combined to infer proprietary controller internals.
-- [ ] Public schemas are benchmark-native rather than copies of private schemas.
-- [ ] Public examples are synthetic and do not reconstruct internal workflows.
-- [ ] Commit messages reveal no private implementation detail.
+- [ ] 각각은 평범해 보이는 여러 파일을 조합했을 때 비공개 내부 구조를 추론할 수 있는지 검토했다.
+- [ ] 공개 스키마는 벤치마크 목적에 맞게 독립적으로 설계되었으며 비공개 스키마를 복사하지 않았다.
+- [ ] 공개 예제는 합성 데이터이며 내부 업무 흐름을 재구성하지 않는다.
+- [ ] 커밋 메시지에 비공개 구현 세부사항이 포함되어 있지 않다.
 
-## Final diff
+## 최종 확인
 
-- [ ] Full diff reviewed.
-- [ ] New and deleted files reviewed.
-- [ ] Tests reviewed.
-- [ ] Documentation reviewed.
-- [ ] Generated artifacts reviewed.
+- [ ] 전체 diff를 확인했다.
+- [ ] 새로 추가되거나 삭제된 파일을 확인했다.
+- [ ] 테스트를 확인했다.
+- [ ] 문서를 확인했다.
+- [ ] 자동 생성 결과물을 확인했다.
 
-If any item is uncertain, do not publish the detail.
+한 항목이라도 판단이 애매하면 해당 세부사항은 공개하지 않습니다.
