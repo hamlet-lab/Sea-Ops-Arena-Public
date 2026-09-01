@@ -6,7 +6,7 @@ from pathlib import Path
 from .benchmark import BenchmarkRun, run_suite
 from .fixtures import ScriptedController, SyntheticEnvironment
 from .io import load_decisions, load_suite
-from .validation import validate_decision_coverage
+from .validation import validate_decision_coverage, validate_public_result_binding
 
 
 @dataclass(frozen=True)
@@ -30,6 +30,7 @@ def compare_decision_files(
 
     for raw_path in decision_paths:
         path = Path(raw_path)
+        validate_public_result_binding(suite_path, path)
         decisions = load_decisions(path)
         validate_decision_coverage(suite, decisions)
         environment = SyntheticEnvironment(
