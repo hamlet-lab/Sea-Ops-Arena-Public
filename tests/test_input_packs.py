@@ -33,6 +33,11 @@ def test_input_pack_contains_fixed_public_task_contract():
 
     assert task["task_id"] == "public-decision-classification-v1"
     assert set(task["status_meanings"]) == {"proceed", "reject", "defer"}
+    assert task["execution_constraints"] == [
+        "use_only_input_pack_content",
+        "no_external_tools_or_retrieval",
+        "return_final_status_map_only",
+    ]
     assert task["output_contract"]["allowed_values"] == [
         "proceed",
         "reject",
@@ -61,6 +66,17 @@ def test_loader_rejects_injected_expected_decision(tmp_path):
     output.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
     with pytest.raises(ValueError, match="평가 전용 필드"):
+        load_input_pack(output)
+
+
+def test_loader_rejects_modified_execution_constraints(tmp_path):
+    output = tmp_path / "unsafe-constraints.json"
+    write_input_pack(SUITE, output)
+    data = json.loads(output.read_text(encoding="utf-8"))
+    data["task"]["execution_constraints"] = ["external_search_allowed"]
+    output.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="execution_constraints"):
         load_input_pack(output)
 
 
