@@ -8,12 +8,16 @@ SEA Ops Arena는 **AI가 실제 운영 환경에 영향을 주는 행동을 제�
 
 > 현재 저장소에 포함된 기본 결과는 합성 시나리오와 고정 응답입니다. **실제 AI 모델 또는 SEA 성능 결과가 아닙니다.**
 
-## 현재 공개판 — v0.5
+## 현재 공개판 — v0.6
 
-현재 공개판은 4개 운영 영역의 **12개 합성 시나리오**를 실행·비교·반복 평가할 수 있으며, 실제 외부 결과를 받을 때 평가 정답이 입력에 섞이지 않도록 별도의 **정답 비노출 입력팩**을 생성합니다.
+현재 공개판은 4개 운영 영역의 **12개 합성 시나리오**를 실행·비교·반복 평가할 수 있으며, 실제 외부 결과를 만들 때 평가 정답이 입력에 섞이지 않도록 별도의 **정답 비노출 입력팩**을 생성합니다.
+
+`arena-input-pack-v2`에는 사례뿐 아니라 공개 과제 정의와 baseline 실행 제약까지 함께 들어가므로, 파일의 SHA-256 하나로 **모델이 본 문제와 지시 조건 전체**를 고정할 수 있습니다.
 
 - JSON 기반 공개 시나리오 실행
-- 정답·평가 태그가 제거된 `arena-input-pack-v1` 생성
+- 정답·평가 태그가 제거된 `arena-input-pack-v2` 생성
+- 입력팩 안에 공개 과제 정의와 `proceed / reject / defer` 의미 고정
+- 첫 baseline에서 외부 검색·도구 사용 금지 조건 고정
 - JSON 기반 공개 판단 결과 입력
 - 여러 결과의 동일 조건 비교
 - 반복 실행의 판단 안정성 집계
@@ -35,15 +39,15 @@ SEA Ops Arena는 **AI가 실제 운영 환경에 영향을 주는 행동을 제�
         |
         |  정답·평가 메타데이터 제거
         v
-정답 비노출 입력팩  ------>  AI 모델 / 사람 / 외부 시스템
-                                  |
-                                  v
-                             최종 판단 결과
-                                  |
-                                  v
-                         공개 결과 최소 포맷
-                                  |
-                                  v
+정답 비노출 입력팩 v2  ---->  AI 모델 / 사람 / 외부 시스템
+  + 공개 과제 정의                |
+  + 실행 제약                     v
+                              최종 판단 결과
+                                   |
+                                   v
+                          공개 결과 최소 포맷
+                                   |
+                                   v
 평가용 공개 시나리오  ------>  Arena 평가 / 비교 / 반복성
 ```
 
@@ -100,7 +104,7 @@ sea-ops-arena-repeat \
     examples/results/v2-repeat-003.public.json
 ```
 
-위 세 결과 파일 역시 실제 모델이 아니라 반복 집계 기능을 보여 주기 위한 fixture입니다.
+위 결과들은 실제 모델이 아니라 Arena 기능을 보여 주기 위한 fixture입니다.
 
 ## 실제 외부 결과를 평가할 때
 
@@ -114,7 +118,17 @@ sea-ops-arena-input-pack \
   --output model-input.json
 ```
 
-`arena-input-pack-v1`에는 사례 설명과 공개 요청만 남고 다음은 제거됩니다.
+`arena-input-pack-v2`에는 다음이 들어갑니다.
+
+- 사례 설명과 공개 요청
+- 공개 과제 정의
+- `proceed` / `reject` / `defer`의 공개 의미
+- 필요한 request ID 목록과 출력 계약
+- `use_only_input_pack_content`
+- `no_external_tools_or_retrieval`
+- `return_final_status_map_only`
+
+반대로 다음 평가 전용 정보는 포함하지 않습니다.
 
 - `expected_decision`
 - 실행 결과 기대값
@@ -129,7 +143,11 @@ sea-ops-arena-input-pack \
 
 모델 호출 또는 비공개 시스템 실행 코드는 이 공개 저장소가 요구하지 않습니다.
 
-별도 환경에서 `model-input.json`을 사용해 판단을 생성한 뒤, 공개 가능한 최종 `proceed` / `reject` / `defer` 값만 다음 단계로 가져옵니다.
+첫 baseline은 같은 입력팩을 사용하고, 외부 검색·RAG·도구 없이, 이전 반복의 대화 상태를 재사용하지 않는 새 실행으로 최소 3회 수행하는 것을 기본 프로토콜로 합니다.
+
+별도 환경에서 판단을 생성한 뒤 공개 가능한 최종 `proceed` / `reject` / `defer` 값만 다음 단계로 가져옵니다.
+
+자세한 조건은 [`docs/BASELINE_PROTOCOL.md`](docs/BASELINE_PROTOCOL.md)에 있습니다.
 
 ### 3. 안전한 공개 결과 템플릿 생성
 
@@ -148,7 +166,9 @@ sea-ops-arena-template \
 템플릿에는 두 개의 결합 해시가 기록됩니다.
 
 - `suite_sha256` — 평가에 사용되는 정확한 시나리오 파일
-- `input_pack_sha256` — 판단 생성 대상이 실제로 본 정답 비노출 입력팩
+- `input_pack_sha256` — 판단 생성 대상이 실제로 본 정답 비노출 입력팩 전체
+
+입력팩 해시에는 사례와 공개 과제 정의, baseline 실행 제약이 모두 포함됩니다.
 
 생성된 `__FILL__` 값만 최종 판단으로 채웁니다. 원본 프롬프트, 시스템 메시지, 응답 전문, 추론 과정, 내부 로그를 복사하지 않습니다.
 
@@ -165,8 +185,9 @@ Arena는 평가 전에 다음을 확인합니다.
 
 1. 결과의 `suite_sha256`이 현재 시나리오와 같은가
 2. 입력팩이 그 시나리오에서 생성됐는가
-3. 결과의 `input_pack_sha256`이 제공된 입력팩과 같은가
-4. 모든 요청 ID의 결과가 빠짐없이 존재하는가
+3. 입력팩의 공개 과제와 실행 제약이 표준 계약과 일치하는가
+4. 결과의 `input_pack_sha256`이 제공된 입력팩과 같은가
+5. 모든 요청 ID의 결과가 빠짐없이 존재하는가
 
 하나라도 맞지 않으면 평가하지 않습니다.
 
@@ -215,7 +236,7 @@ sea-ops-arena-audit --root .
 - 키·인증서 형식 파일
 - 공개 저장소에서 사용하지 않는 위험 경로
 - 엄격 공개 결과 포맷 오류
-- 정답 비노출 입력팩 포맷 오류
+- 정답 비노출 입력팩 포맷과 공개 과제 계약 오류
 - 실제 결과가 참조하는 시나리오 해시
 - 실제 결과가 참조하는 입력팩 해시와 입력팩 파일의 존재
 
@@ -224,7 +245,7 @@ sea-ops-arena-audit --root .
 ## 무엇을 공개하나
 
 - 합성 공개 시나리오
-- 정답 비노출 모델 입력 형식
+- 정답 비노출 모델 입력 형식과 공개 benchmark 과제
 - 공개 가능한 최종 판단 결과 형식
 - 공개 시뮬레이터 결과
 - 일반적인 점수화·비교·반복성·보고서·재현 도구
@@ -251,6 +272,7 @@ sea-ops-arena-audit --root .
 - [`docs/REVIEWER_GUIDE.md`](docs/REVIEWER_GUIDE.md) — 외부 검토자용 3분 가이드
 - [`docs/QUICKSTART.md`](docs/QUICKSTART.md) — 실행 방법
 - [`docs/BLIND_EVALUATION.md`](docs/BLIND_EVALUATION.md) — 정답 비노출 실제 평가 절차
+- [`docs/BASELINE_PROTOCOL.md`](docs/BASELINE_PROTOCOL.md) — 첫 실제 모델 baseline 조건
 - [`docs/PUBLIC_RESULTS.md`](docs/PUBLIC_RESULTS.md) — 공개 결과 파일 규칙
 - [`docs/EVALUATION.md`](docs/EVALUATION.md) — 평가 지표
 - [`docs/SCENARIOS.md`](docs/SCENARIOS.md) — 합성 시나리오 작성 원칙
