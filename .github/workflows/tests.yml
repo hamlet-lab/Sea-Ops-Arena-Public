@@ -30,6 +30,9 @@ jobs:
       - name: 공개 테스트 실행
         run: python -m pytest -q
 
+      - name: 공개 릴리스 감사
+        run: sea-ops-arena-audit --root .
+
       - name: 단일 평가 CLI 확인
         run: |
           sea-ops-arena \
