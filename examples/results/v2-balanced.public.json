@@ -1,0 +1,24 @@
+{
+  "schema_version": "public-decision-set-v1",
+  "label": "v2-balanced-public-format",
+  "source": {
+    "kind": "fixture",
+    "model_name": "synthetic-example",
+    "model_version": "v1",
+    "repeat_id": "example-001"
+  },
+  "decisions": {
+    "v2-cs-01": "proceed",
+    "v2-cs-02": "reject",
+    "v2-cs-03": "defer",
+    "v2-office-01": "proceed",
+    "v2-office-02": "defer",
+    "v2-office-03": "reject",
+    "v2-inventory-01": "proceed",
+    "v2-inventory-02": "reject",
+    "v2-inventory-03": "defer",
+    "v2-facility-01": "proceed",
+    "v2-facility-02": "reject",
+    "v2-facility-03": "proceed"
+  }
+}
