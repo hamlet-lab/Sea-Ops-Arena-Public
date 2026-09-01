@@ -1,0 +1,65 @@
+{
+  "suite_id": "public-demo-v1",
+  "title": "SEA Ops Arena 공개 합성 데모",
+  "description": "고객지원·사무·재고관리 상황으로 구성한 공개 예시",
+  "metadata": {
+    "kind": "synthetic",
+    "language": "ko",
+    "version": "1"
+  },
+  "cases": [
+    {
+      "case_id": "customer-return-complete",
+      "title": "반품 정보가 모두 갖춰진 요청",
+      "description": "공개 예시에서 필요한 정보가 모두 제공된 반품 요청",
+      "expected_decision": "proceed",
+      "environment_status": "executed",
+      "tags": ["customer-support", "synthetic"],
+      "request": {
+        "request_id": "req-customer-return",
+        "scenario_id": "customer-support",
+        "action": "issue_refund",
+        "target": "demo-order-1001",
+        "parameters": {
+          "amount": 32000,
+          "currency": "KRW"
+        }
+      }
+    },
+    {
+      "case_id": "office-purchase-incomplete",
+      "title": "필수 정보가 빠진 비품 구매 요청",
+      "description": "공개 예시에서 금액 정보가 누락된 구매 요청",
+      "expected_decision": "defer",
+      "environment_status": "executed",
+      "tags": ["office-ops", "synthetic"],
+      "request": {
+        "request_id": "req-office-purchase",
+        "scenario_id": "office-ops",
+        "action": "submit_purchase",
+        "target": "demo-equipment",
+        "parameters": {
+          "quantity": 2
+        }
+      }
+    },
+    {
+      "case_id": "inventory-duplicate-restock",
+      "title": "이미 처리된 재고 보충 요청의 재입력",
+      "description": "공개 예시에서 동일 작업이 이미 처리됐다고 명시된 요청",
+      "expected_decision": "reject",
+      "environment_status": "executed",
+      "tags": ["inventory", "synthetic"],
+      "request": {
+        "request_id": "req-inventory-restock",
+        "scenario_id": "inventory",
+        "action": "restock_item",
+        "target": "demo-item-42",
+        "parameters": {
+          "quantity": 10,
+          "already_processed": true
+        }
+      }
+    }
+  ]
+}
