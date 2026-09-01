@@ -1,0 +1,10 @@
+{
+  "profile": "cautious",
+  "kind": "synthetic",
+  "description": "모든 요청을 보류하도록 미리 정한 합성 응답",
+  "decisions": {
+    "req-customer-return": "defer",
+    "req-office-purchase": "defer",
+    "req-inventory-restock": "defer"
+  }
+}
