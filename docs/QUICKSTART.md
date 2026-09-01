@@ -1,6 +1,6 @@
 # 빠른 실행
 
-이 저장소의 기본 데모는 외부 API 키나 실제 운영 시스템 없이 실행할 수 있습니다.
+이 저장소의 공개 예시는 외부 API 키나 실제 운영 시스템 없이 실행할 수 있습니다.
 
 ## 설치
 
@@ -10,38 +10,75 @@ Python 3.11 이상을 권장합니다.
 python -m pip install -e .
 ```
 
-## 1. 기본 합성 데모
+## 1. 12개 공개 합성 시나리오 실행
+
+현재 대표 공개 세트는 `public_suite_v2.json`입니다.
+
+```bash
+sea-ops-arena \
+  --suite examples/scenarios/public_suite_v2.json \
+  --decisions examples/decisions/v2-balanced.json
+```
+
+`v2-balanced`는 공개 기대값과 동일하게 준비한 고정 예시이며 실제 모델 또는 SEA 성능이 아닙니다.
+
+## 2. 서로 다른 응답 패턴 비교
+
+같은 12개 시나리오에 다른 고정 결과를 넣어 Arena가 차이를 어떻게 집계하는지 확인할 수 있습니다.
+
+```bash
+sea-ops-arena \
+  --suite examples/scenarios/public_suite_v2.json \
+  --decisions examples/decisions/v2-eager.json
+
+sea-ops-arena \
+  --suite examples/scenarios/public_suite_v2.json \
+  --decisions examples/decisions/v2-cautious.json
+```
+
+- `v2-balanced`: 공개 기대값과 동일한 고정 예시
+- `v2-eager`: 모든 요청을 진행하는 고정 예시
+- `v2-cautious`: 모든 요청을 보류하는 고정 예시
+
+## 3. 재현 가능한 실행 결과 묶음 저장
+
+`--output-dir`을 지정하면 입력 파일의 SHA-256 해시와 결과를 함께 저장합니다.
+
+```bash
+sea-ops-arena \
+  --suite examples/scenarios/public_suite_v2.json \
+  --decisions examples/decisions/v2-balanced.json \
+  --output-dir runs
+```
+
+`runs/<run_id>/` 아래에 다음 세 파일이 생성됩니다.
+
+- `manifest.json`: 공개 입력 파일명, SHA-256 해시, 실행 식별자, 요약 지표
+- `report.md`: 사람이 읽기 쉬운 한국어 결과 보고서
+- `results.json`: 후속 분석에 사용할 수 있는 구조화 결과
+
+`run_id`는 공개 시나리오 파일과 판단 결과 파일의 해시로 결정됩니다. 같은 두 입력 파일을 사용하면 같은 실행 식별자를 얻습니다.
+
+manifest에는 호스트명, 환경변수, 내부 시스템 경로, 비공개 판단 과정 같은 정보가 포함되지 않습니다.
+
+## 4. JSON 결과를 표준 출력으로 보기
+
+```bash
+sea-ops-arena \
+  --suite examples/scenarios/public_suite_v2.json \
+  --decisions examples/decisions/v2-balanced.json \
+  --format json
+```
+
+## 5. 작은 v1 데모
+
+처음 구조를 빠르게 살펴보고 싶다면 기존 3개 사례 데모도 유지합니다.
 
 ```bash
 python -m sea_ops_arena.demo
 ```
 
-기본값은 `balanced` 프로필이며 Markdown 형식의 결과를 출력합니다.
-
-## 2. 서로 다른 공개 예시 응답 비교
-
-```bash
-python -m sea_ops_arena.demo --profile eager
-python -m sea_ops_arena.demo --profile cautious
-```
-
-세 프로필은 실제 모델이 아니라 Arena의 집계 차이를 확인하기 위한 고정된 예시입니다.
-
-- `balanced`: 공개 기대값과 동일하게 준비된 응답
-- `eager`: 모든 요청을 진행하는 예시 응답
-- `cautious`: 모든 요청을 보류하는 예시 응답
-
-## 3. JSON 결과 출력
-
-```bash
-python -m sea_ops_arena.demo --profile balanced --format json
-```
-
-JSON 출력은 자동 집계나 외부 시각화 도구와 연결할 때 사용할 수 있습니다.
-
-## 4. 외부 JSON 파일로 벤치마크 실행
-
-공개 시나리오와 공개 판단 결과를 파일로 분리해 같은 Arena에서 실행할 수 있습니다.
+또는:
 
 ```bash
 sea-ops-arena \
@@ -49,37 +86,18 @@ sea-ops-arena \
   --decisions examples/decisions/balanced.json
 ```
 
-JSON 보고서가 필요하면 다음과 같이 실행합니다.
-
-```bash
-sea-ops-arena \
-  --suite examples/scenarios/public_demo_v1.json \
-  --decisions examples/decisions/eager.json \
-  --format json
-```
-
-이 구조를 사용하면 Arena 코드를 바꾸지 않고 새로운 공개 시나리오나 외부 시스템의 공개 판단 결과를 입력할 수 있습니다.
-
-## 5. 예제 파일
-
-- `examples/scenarios/public_demo_v1.json`: 세 개의 합성 운영 사례
-- `examples/decisions/balanced.json`: 공개 기대값과 일치하는 고정 예시
-- `examples/decisions/eager.json`: 모든 요청을 진행하는 고정 예시
-- `examples/decisions/cautious.json`: 모든 요청을 보류하는 고정 예시
-- `examples/DEMO_RESULTS.md`: 세 응답 패턴의 결과 비교 예시
-
 ## 6. 테스트
 
 ```bash
 python -m pytest
 ```
 
-테스트는 공개 하네스와 공개 지표의 동작만 검증합니다. 비공개 의사결정 시스템의 내부 규칙이나 구조를 검증하지 않습니다.
+테스트는 공개 하네스, 공개 입출력, 공개 지표와 재현용 결과 묶음만 검증합니다. 비공개 의사결정 시스템의 내부 규칙이나 구조를 검증하지 않습니다.
 
 GitHub Actions에서도 같은 공개 테스트를 자동 실행합니다.
 
 ## 결과를 볼 때 주의할 점
 
-현재 기본 데모는 **합성 시나리오 + 고정 응답**으로 이루어져 있습니다. 따라서 여기서 나오는 수치를 실제 SEA 성능, 실제 AI 모델 성능, 산업 현장 성능으로 해석하면 안 됩니다.
+현재 저장소에 포함된 기본 결과는 **합성 시나리오 + 고정 응답**입니다. 따라서 여기서 나오는 수치를 실제 SEA 성능, 실제 AI 모델 성능 또는 산업 현장 성능으로 해석하면 안 됩니다.
 
-실제 비교 결과가 추가될 경우에는 모델명, 실행 조건, 시나리오 버전, 결과 원문과 함께 별도로 표시합니다.
+공개 시나리오의 작성 원칙은 [`SCENARIOS.md`](SCENARIOS.md)를 참고해 주세요. 실제 비교 결과가 추가될 경우에는 모델명, 실행 조건, 시나리오 버전과 공개 가능한 결과 자료를 별도로 표시합니다.
