@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from .contracts import DecisionStatus, ExecutionRequest, ExecutionStatus
+from .public_results import load_public_decision_set
 from .scenarios import BenchmarkCase, BenchmarkSuite
 
 
@@ -81,9 +82,16 @@ def load_suite(path: str | Path) -> BenchmarkSuite:
 
 
 def load_decisions(path: str | Path) -> dict[str, DecisionStatus]:
-    """공개 JSON 파일에서 요청별 판단 결과를 읽는다."""
+    """공개 JSON 파일에서 요청별 판단 결과를 읽는다.
+
+    `schema_version`이 있는 파일은 허용 필드 기반의 엄격한 공개 결과 포맷으로
+    검증한다. 기존 합성 fixture 파일은 단순 decisions 포맷으로 계속 지원한다.
+    """
 
     data = _read_json(path)
+    if "schema_version" in data:
+        return load_public_decision_set(path).decisions
+
     raw_decisions = data.get("decisions")
     if not isinstance(raw_decisions, dict) or not raw_decisions:
         raise ValueError("decisions는 하나 이상의 요청별 결과를 포함한 객체여야 합니다")
