@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 
+from .artifacts import write_run_bundle
 from .benchmark import run_suite
 from .fixtures import ScriptedController, SyntheticEnvironment
 from .io import load_decisions, load_suite
@@ -18,7 +19,11 @@ def main() -> None:
         "--format",
         choices=("markdown", "json"),
         default="markdown",
-        help="출력 형식",
+        help="표준 출력 형식",
+    )
+    parser.add_argument(
+        "--output-dir",
+        help="지정하면 재현용 manifest, Markdown, JSON 결과 묶음을 이 경로 아래에 저장합니다.",
     )
     args = parser.parse_args()
 
@@ -28,6 +33,11 @@ def main() -> None:
         outcomes={case.request.request_id: case.environment_status for case in suite.cases}
     )
     run = run_suite(suite, ScriptedController(decisions), environment)
+
+    if args.output_dir:
+        run_dir = write_run_bundle(run, args.suite, args.decisions, args.output_dir)
+        print(f"실행 결과 묶음: {run_dir}\n", end="")
+
     print(to_json(run) if args.format == "json" else to_markdown(run), end="")
 
 
