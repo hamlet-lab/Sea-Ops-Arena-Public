@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from sea_ops_arena.artifacts import sha256_file
+from sea_ops_arena.input_packs import write_input_pack
 from sea_ops_arena.io import load_decisions, load_suite
 from sea_ops_arena.public_results import load_public_decision_set
 from sea_ops_arena.validation import (
@@ -66,17 +67,40 @@ def test_non_fixture_result_requires_suite_hash(tmp_path):
         validate_public_result_binding(SUITE, path)
 
 
-def test_suite_hash_binding_accepts_exact_suite_and_rejects_mismatch(tmp_path):
+def test_non_fixture_result_requires_input_pack_hash(tmp_path):
     data = json.loads(PUBLIC_RESULT.read_text(encoding="utf-8"))
     data["source"]["kind"] = "model"
     data["source"]["model_name"] = "public-example-model"
     data["suite_sha256"] = sha256_file(SUITE)
+    data.pop("input_pack_sha256", None)
     path = tmp_path / "model-result.json"
     path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
-    validate_public_result_binding(SUITE, path)
+    with pytest.raises(ValueError, match="input_pack_sha256"):
+        validate_public_result_binding(SUITE, path)
+
+
+def test_suite_and_input_pack_binding_accept_exact_files_and_reject_mismatch(tmp_path):
+    input_pack = tmp_path / "model-input.json"
+    write_input_pack(SUITE, input_pack)
+
+    data = json.loads(PUBLIC_RESULT.read_text(encoding="utf-8"))
+    data["source"]["kind"] = "model"
+    data["source"]["model_name"] = "public-example-model"
+    data["suite_sha256"] = sha256_file(SUITE)
+    data["input_pack_sha256"] = sha256_file(input_pack)
+    path = tmp_path / "model-result.json"
+    path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+
+    validate_public_result_binding(SUITE, path, input_pack)
 
     data["suite_sha256"] = "0" * 64
     path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
-    with pytest.raises(ValueError, match="일치하지 않습니다"):
-        validate_public_result_binding(SUITE, path)
+    with pytest.raises(ValueError, match="suite_sha256"):
+        validate_public_result_binding(SUITE, path, input_pack)
+
+    data["suite_sha256"] = sha256_file(SUITE)
+    data["input_pack_sha256"] = "0" * 64
+    path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    with pytest.raises(ValueError, match="input_pack_sha256"):
+        validate_public_result_binding(SUITE, path, input_pack)
