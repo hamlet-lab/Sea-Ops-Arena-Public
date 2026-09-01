@@ -45,6 +45,7 @@ class RepeatEvaluation:
 def evaluate_repeated_results(
     suite_path: str | Path,
     result_paths: list[str | Path],
+    input_pack_path: str | Path | None = None,
 ) -> RepeatEvaluation:
     """동일 출처의 엄격 공개 결과를 반복 실행 단위로 평가한다.
 
@@ -64,7 +65,7 @@ def evaluate_repeated_results(
 
     for raw_path in result_paths:
         path = Path(raw_path)
-        validate_public_result_binding(suite_path, path)
+        validate_public_result_binding(suite_path, path, input_pack_path)
         result_set = load_public_decision_set(path)
         validate_decision_coverage(suite, result_set.decisions)
 
