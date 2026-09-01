@@ -1,0 +1,18 @@
+{
+  "profile": "v2-eager",
+  "description": "모든 요청을 진행하는 고정 예시. 실제 모델 또는 SEA 성능이 아니다.",
+  "decisions": {
+    "v2-cs-01": "proceed",
+    "v2-cs-02": "proceed",
+    "v2-cs-03": "proceed",
+    "v2-office-01": "proceed",
+    "v2-office-02": "proceed",
+    "v2-office-03": "proceed",
+    "v2-inventory-01": "proceed",
+    "v2-inventory-02": "proceed",
+    "v2-inventory-03": "proceed",
+    "v2-facility-01": "proceed",
+    "v2-facility-02": "proceed",
+    "v2-facility-03": "proceed"
+  }
+}
