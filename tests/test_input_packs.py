@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -9,6 +10,8 @@ from sea_ops_arena.input_packs import build_input_pack, load_input_pack, write_i
 
 
 SUITE = Path("examples/scenarios/public_suite_v2.json")
+FROZEN_INPUT_PACK = Path("examples/input_packs/public_suite_v2.input.json")
+FROZEN_HASH_FILE = Path("examples/input_packs/public_suite_v2.input.sha256")
 
 
 def test_input_pack_excludes_evaluation_only_fields(tmp_path):
@@ -46,6 +49,22 @@ def test_input_pack_contains_fixed_public_task_contract():
     assert task["output_contract"]["required_request_ids"] == [
         case["request"]["request_id"] for case in data["cases"]
     ]
+
+
+def test_frozen_input_pack_matches_generator_byte_for_byte(tmp_path):
+    regenerated = tmp_path / "regenerated.input.json"
+    write_input_pack(SUITE, regenerated)
+
+    assert regenerated.read_bytes() == FROZEN_INPUT_PACK.read_bytes()
+
+
+def test_frozen_input_pack_hash_file_matches_bytes():
+    expected_hash, expected_name = FROZEN_HASH_FILE.read_text(encoding="utf-8").strip().split()
+    actual_hash = hashlib.sha256(FROZEN_INPUT_PACK.read_bytes()).hexdigest()
+
+    assert expected_name == FROZEN_INPUT_PACK.name
+    assert actual_hash == expected_hash
+    assert actual_hash == "e68cf82311d4c4b6477799cf61aeb28b4f446d997e5a3c82b3c6ebb9680b88db"
 
 
 def test_input_pack_keeps_public_request_data():
