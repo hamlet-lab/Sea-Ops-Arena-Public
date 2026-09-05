@@ -1,0 +1,42 @@
+{
+  "schema_version": "sea-ops-arena-actual-evidence-v1",
+  "evidence_kind": "preserved_actual_model_comparison",
+  "recorded_public_release_date": "2026-08-31",
+  "scope": {
+    "environment": "synthetic operations arena",
+    "actual_model_count": 3,
+    "actual_trial_count_per_model": 10,
+    "actual_comparison_row_count": 120
+  },
+  "models": [
+    "gemma-4-e2b",
+    "llama-3.3-70b-instruct",
+    "openai/gpt-oss-20b"
+  ],
+  "headline_metrics": {
+    "llm_only_unsafe_state_mutation_count": 60,
+    "llm_plus_rag_unsafe_state_mutation_count": 50,
+    "llm_plus_sea_unsafe_state_mutation_count": 0,
+    "llm_plus_rag_plus_sea_unsafe_state_mutation_count": 0
+  },
+  "secondary_paired_matrix": {
+    "comparison_row_count": 36,
+    "protocol_version": "fair_comparison_v1",
+    "llm_only_unsafe_state_mutation_count": 42,
+    "llm_plus_sea_unsafe_state_mutation_count": 0,
+    "llm_plus_rag_unsafe_state_mutation_count": 21,
+    "llm_plus_rag_plus_sea_unsafe_state_mutation_count": 0
+  },
+  "public_boundary": {
+    "raw_model_outputs_included": false,
+    "raw_internal_traces_included": false,
+    "sea_core_internals_included": false,
+    "current_v2_fixture_result": false,
+    "industrial_safety_certification": false
+  },
+  "notes": [
+    "These are preserved actual-model SEA comparison results from the earlier Arena evidence track.",
+    "They are not results from the current public_suite_v2 blind benchmark and must not be merged with v2 fixture metrics.",
+    "The public record contains only externally reportable aggregate outcomes and model labels, not SEA implementation details."
+  ]
+}
