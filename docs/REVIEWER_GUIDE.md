@@ -4,13 +4,31 @@ SEA Ops Arena는 AI가 제안한 행동을 동일한 공개 조건에서 비교�
 
 ## 가장 먼저 볼 곳
 
-1. [`../README.md`](../README.md) : 프로젝트 목적, 구조, 합성 데모 결과
-2. [`../examples/V2_COMPARISON.md`](../examples/V2_COMPARISON.md) : 고정 fixture 비교 결과
-3. [`EVALUATION.md`](EVALUATION.md) : 지표 의미
-4. [`BLIND_EVALUATION.md`](BLIND_EVALUATION.md) : 정답 비노출 평가 방법
-5. [`PUBLIC_RESULTS.md`](PUBLIC_RESULTS.md) : 외부 결과 포맷
+1. [`../README.md`](../README.md) : 프로젝트 목적과 실제 SEA 대표 결과
+2. [`ACTUAL_SEA_EVIDENCE.md`](ACTUAL_SEA_EVIDENCE.md) : 실제 모델 + SEA 비교 결과와 주장 경계
+3. [`../evidence/sea_actual_headline_v1.json`](../evidence/sea_actual_headline_v1.json) : 구조화된 실제 결과 요약
+4. [`../examples/V2_COMPARISON.md`](../examples/V2_COMPARISON.md) : 현재 v2 고정 fixture 비교 예제
+5. [`EVALUATION.md`](EVALUATION.md) : 현재 v2 지표 의미
+6. [`BLIND_EVALUATION.md`](BLIND_EVALUATION.md) : 현재 v2 정답 비노출 평가 방법
 
-## 현재 공개된 것
+## 실제 SEA 결과
+
+보존된 이전 Arena 실제 모델 비교 트랙에는 3개 로컬 모델, 모델별 10회, 총 120개 비교 행이 있습니다.
+
+| 실행 조건 | 위험 상태 변경 |
+|---|---:|
+| LLM only | 60 |
+| LLM + RAG | 50 |
+| LLM + SEA | 0 |
+| LLM + RAG + SEA | 0 |
+
+별도의 36행 paired matrix에서도 `42 → 0`, `21 → 0`의 SEA 적용 전후 차이가 기록되었습니다.
+
+두 집계는 서로 다른 프로토콜입니다. 서로 합산하지 않으며, 현재 `public_suite_v2` fixture 점수와도 섞지 않습니다.
+
+## 현재 공개 v2 평가 표면
+
+현재 v2에는 다음이 공개되어 있습니다.
 
 - 4개 운영 영역의 12개 합성 시나리오
 - `proceed / reject / defer` 판단 비교
@@ -27,22 +45,29 @@ SEA Ops Arena는 AI가 제안한 행동을 동일한 공개 조건에서 비교�
 
 Arena는 "실행 자체가 성공했는가"와 "그 실행을 선택한 판단이 적절했는가"를 분리합니다.
 
-예를 들어 `eager` fixture는 합성 실행 성공률이 100%지만 불필요 실행이 7회 발생합니다. 실행 성공률만 보면 드러나지 않는 차이를 별도 지표로 확인할 수 있습니다.
+현재 v2의 `eager` fixture는 합성 실행 성공률이 100%지만 불필요 실행이 7회 발생합니다. 이 fixture는 평가기 사용 예시이며 실제 SEA 성능 결과가 아닙니다.
+
+반대로 위의 실제 SEA 결과는 이전 실제 모델 비교 트랙에서 나온 결과이며 현재 v2 blind baseline으로 가장하지 않습니다.
 
 ## 정답이 공개되어 있는데 평가가 가능한 이유
 
-평가용 시나리오에는 외부에서 계산을 재현할 수 있도록 기대 판단이 포함될 수 있습니다.
+현재 v2 평가용 시나리오에는 외부에서 계산을 재현할 수 있도록 기대 판단이 포함될 수 있습니다.
 
 실제 판단 생성에는 기대 판단과 평가 태그가 제거된 별도 입력팩을 사용합니다. 따라서 평가 기준은 공개하면서 실제 판단 입력에서는 정답을 분리할 수 있습니다.
 
-## 현재 결과의 성격
+## 주장 경계
 
-현재 기본 결과는 합성 시나리오와 고정 fixture입니다. 실제 SEA 성능이나 특정 상용 AI 모델 성능을 주장하는 수치가 아닙니다.
+실제 SEA 결과가 보여 주는 것은 해당 합성 운영 Arena의 실험 범위에서 실행 구조 차이가 외부 결과에 영향을 주었다는 것입니다.
 
-실제 외부 결과가 추가될 경우에도 같은 공개 시나리오, 입력팩과 지표 체계를 그대로 사용할 수 있습니다.
+다음을 주장하지 않습니다.
+
+- 실제 산업 현장의 안전 인증
+- 모든 환경에서의 무사고 보장
+- 특정 LLM의 우열
+- 공개 자료만으로 SEA 내부 구조를 재구성할 수 있다는 주장
 
 ## 내부 구현이 보이지 않는 이유
 
-Arena가 확인하는 것은 입력, 최종 판단, 실행 결과와 공개 지표입니다.
+Arena가 공개하는 것은 입력 조건, 최종 결과, 집계 지표와 재현 가능한 공개 표면입니다.
 
-SEA 또는 다른 연결 시스템이 내부에서 어떤 구조로 판단했는지는 공개 평가에 필요하지 않습니다.
+SEA의 내부 상태 표현, 정책, 권한 처리, 검증·실행 제어 구조, raw prompt/output/trace는 공개 평가에 필요하지 않으며 이 저장소에 포함하지 않습니다.
