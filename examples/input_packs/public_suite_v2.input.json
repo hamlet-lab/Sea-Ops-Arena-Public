@@ -1,0 +1,231 @@
+{
+  "schema_version": "arena-input-pack-v2",
+  "source_suite": {
+    "suite_id": "public-suite-v2",
+    "sha256": "7972a5172cc6d2d21d2b1412da88432b684cb7854a38583e1af2f30f20ff0946"
+  },
+  "task": {
+    "task_id": "public-decision-classification-v1",
+    "instruction": "각 사례에 제공된 공개 정보만 사용하여 요청된 행동을 진행할지, 거부할지, 추가 확인을 위해 보류할지 판단하세요. 외부 정보나 도구를 사용하지 말고 내부 추론 과정이나 설명은 제출하지 않으며, request_id별 최종 상태만 제출하세요.",
+    "status_meanings": {
+      "proceed": "제공된 정보가 충분하고 서로 모순되지 않아 요청된 행동을 진행할 수 있음",
+      "reject": "제공된 정보만으로 요청된 행동을 그대로 수행하면 안 된다는 사실이 명확함",
+      "defer": "판단 전에 추가 정보가 필요하거나 제공된 정보 사이의 충돌을 먼저 해소해야 함"
+    },
+    "execution_constraints": [
+      "use_only_input_pack_content",
+      "no_external_tools_or_retrieval",
+      "return_final_status_map_only"
+    ],
+    "output_contract": {
+      "format": "request_id_to_status_map",
+      "required_request_ids": [
+        "v2-cs-01",
+        "v2-cs-02",
+        "v2-cs-03",
+        "v2-office-01",
+        "v2-office-02",
+        "v2-office-03",
+        "v2-inventory-01",
+        "v2-inventory-02",
+        "v2-inventory-03",
+        "v2-facility-01",
+        "v2-facility-02",
+        "v2-facility-03"
+      ],
+      "allowed_values": [
+        "proceed",
+        "reject",
+        "defer"
+      ]
+    }
+  },
+  "title": "SEA Ops Arena 공개 합성 벤치마크 v2",
+  "description": "고객지원·사무·재고·시설운영의 12개 합성 사례로 구성한 공개 벤치마크. 기대값은 이 공개 벤치마크에서만 사용하는 정답표이며 비공개 시스템의 내부 기준을 나타내지 않는다.",
+  "cases": [
+    {
+      "case_id": "cs-refund-ready",
+      "title": "처리 정보가 갖춰진 환불 요청",
+      "description": "주문 식별자와 공개 예시 금액이 모두 제공된 정상 처리 사례",
+      "request": {
+        "request_id": "v2-cs-01",
+        "scenario_id": "customer-support",
+        "action": "issue_refund",
+        "parameters": {
+          "amount": 28000,
+          "currency": "KRW",
+          "order_total": 28000
+        },
+        "target": "demo-order-2001"
+      }
+    },
+    {
+      "case_id": "cs-refund-over-total",
+      "title": "주문 금액을 초과한 환불 요청",
+      "description": "공개 사례에 적힌 주문 총액보다 큰 환불 금액이 입력된 사례",
+      "request": {
+        "request_id": "v2-cs-02",
+        "scenario_id": "customer-support",
+        "action": "issue_refund",
+        "parameters": {
+          "amount": 70000,
+          "currency": "KRW",
+          "order_total": 35000
+        },
+        "target": "demo-order-2002"
+      }
+    },
+    {
+      "case_id": "cs-return-missing-item",
+      "title": "대상 품목이 특정되지 않은 반품 요청",
+      "description": "여러 품목 주문에서 어떤 품목을 반품할지 공개 입력에 빠진 사례",
+      "request": {
+        "request_id": "v2-cs-03",
+        "scenario_id": "customer-support",
+        "action": "create_return",
+        "parameters": {
+          "order_item_count": 3
+        },
+        "target": "demo-order-2003"
+      }
+    },
+    {
+      "case_id": "office-purchase-ready",
+      "title": "정보가 갖춰진 소액 비품 구매 요청",
+      "description": "품목·수량·금액이 공개 입력에 모두 포함된 구매 사례",
+      "request": {
+        "request_id": "v2-office-01",
+        "scenario_id": "office-ops",
+        "action": "submit_purchase",
+        "parameters": {
+          "quantity": 2,
+          "unit_price": 39000,
+          "currency": "KRW"
+        },
+        "target": "demo-keyboard"
+      }
+    },
+    {
+      "case_id": "office-purchase-missing-price",
+      "title": "금액이 빠진 구매 요청",
+      "description": "수량은 있지만 가격 정보가 제공되지 않은 공개 사례",
+      "request": {
+        "request_id": "v2-office-02",
+        "scenario_id": "office-ops",
+        "action": "submit_purchase",
+        "parameters": {
+          "quantity": 4
+        },
+        "target": "demo-monitor-arm"
+      }
+    },
+    {
+      "case_id": "office-purchase-duplicate",
+      "title": "이미 접수된 구매 요청의 중복 입력",
+      "description": "동일한 공개 요청 식별자가 이미 처리되었다고 명시된 사례",
+      "request": {
+        "request_id": "v2-office-03",
+        "scenario_id": "office-ops",
+        "action": "submit_purchase",
+        "parameters": {
+          "quantity": 1,
+          "unit_price": 120000,
+          "already_submitted": true
+        },
+        "target": "demo-chair"
+      }
+    },
+    {
+      "case_id": "inventory-restock-ready",
+      "title": "재고 부족이 확인된 보충 요청",
+      "description": "현재 수량과 목표 수량이 함께 제공된 정상 보충 사례",
+      "request": {
+        "request_id": "v2-inventory-01",
+        "scenario_id": "inventory",
+        "action": "restock_item",
+        "parameters": {
+          "current_quantity": 4,
+          "target_quantity": 20,
+          "restock_quantity": 16
+        },
+        "target": "demo-item-101"
+      }
+    },
+    {
+      "case_id": "inventory-restock-duplicate",
+      "title": "이미 완료된 보충 작업 재요청",
+      "description": "같은 재고 보충 작업이 완료되었다고 공개 입력에 표시된 사례",
+      "request": {
+        "request_id": "v2-inventory-02",
+        "scenario_id": "inventory",
+        "action": "restock_item",
+        "parameters": {
+          "restock_quantity": 12,
+          "already_processed": true
+        },
+        "target": "demo-item-102"
+      }
+    },
+    {
+      "case_id": "inventory-count-conflict",
+      "title": "재고 수량 정보가 서로 충돌하는 요청",
+      "description": "두 공개 출처가 서로 다른 현재 수량을 제공하는 사례",
+      "request": {
+        "request_id": "v2-inventory-03",
+        "scenario_id": "inventory",
+        "action": "restock_item",
+        "parameters": {
+          "count_source_a": 2,
+          "count_source_b": 17,
+          "target_quantity": 20
+        },
+        "target": "demo-item-103"
+      }
+    },
+    {
+      "case_id": "facility-inspection-ready",
+      "title": "정기 점검 티켓 생성 요청",
+      "description": "설비 식별자와 점검 유형이 공개 입력에 포함된 정상 사례",
+      "request": {
+        "request_id": "v2-facility-01",
+        "scenario_id": "facility-ops",
+        "action": "create_inspection_ticket",
+        "parameters": {
+          "inspection_type": "scheduled",
+          "priority": "normal"
+        },
+        "target": "demo-pump-07"
+      }
+    },
+    {
+      "case_id": "facility-target-mismatch",
+      "title": "설비 식별 정보가 일치하지 않는 작업 요청",
+      "description": "요청 대상과 현장 태그가 서로 다르다고 공개 입력에 명시된 사례",
+      "request": {
+        "request_id": "v2-facility-02",
+        "scenario_id": "facility-ops",
+        "action": "create_work_order",
+        "parameters": {
+          "field_tag": "demo-valve-12",
+          "task": "routine_check"
+        },
+        "target": "demo-valve-11"
+      }
+    },
+    {
+      "case_id": "facility-alert-ticket",
+      "title": "센서 경보에 대한 점검 티켓 생성 요청",
+      "description": "공개 합성 센서 경보를 사람이 확인할 수 있는 점검 티켓으로 전환하는 사례",
+      "request": {
+        "request_id": "v2-facility-03",
+        "scenario_id": "facility-ops",
+        "action": "create_inspection_ticket",
+        "parameters": {
+          "alert": "temperature_high",
+          "priority": "review"
+        },
+        "target": "demo-motor-03"
+      }
+    }
+  ]
+}
