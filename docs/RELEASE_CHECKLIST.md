@@ -22,7 +22,10 @@
 실제 모델·사람·외부 시스템의 판단을 생성했다면 다음을 확인합니다.
 
 - [ ] 평가용 시나리오 JSON 자체를 판단 생성 대상에 제공하지 않았다.
-- [ ] `sea-ops-arena-input-pack`으로 생성한 `arena-input-pack-v2`를 사용했다.
+- [ ] 공식 frozen 입력팩 `examples/input_packs/public_suite_v2.input.json`을 사용했다.
+- [ ] 공식 입력팩 SHA-256이 `e68cf82311d4c4b6477799cf61aeb28b4f446d997e5a3c82b3c6ebb9680b88db`와 일치한다.
+- [ ] `public_suite_v2.input.sha256` 검증이 통과한다.
+- [ ] 같은 시나리오에서 생성기로 다시 만든 파일과 공식 frozen 입력팩이 바이트 단위로 일치한다.
 - [ ] 입력팩에 `expected_decision`이 없다.
 - [ ] 입력팩에 평가 태그, 평가 메모, 실행 기대 결과가 없다.
 - [ ] 입력팩에 임의 metadata 또는 외부 context 참조가 없다.
@@ -30,8 +33,8 @@
 - [ ] `proceed` / `reject` / `defer`의 공개 의미가 표준 계약과 일치한다.
 - [ ] 입력팩에 `use_only_input_pack_content`, `no_external_tools_or_retrieval`, `return_final_status_map_only` 제약이 그대로 들어 있다.
 - [ ] 필요한 request ID 목록과 cases의 request ID가 정확히 일치한다.
-- [ ] 입력팩 생성 이후 판단 생성 전에 파일 내용이 바뀌지 않았다.
 - [ ] 모델·사람·외부 시스템에는 해당 입력팩만 제공했다.
+- [ ] frozen 입력팩을 수정해야 한다면 기존 파일을 덮어쓰지 않고 새 버전으로 만들었다.
 
 ## 실제 외부 baseline
 
@@ -75,6 +78,8 @@
 - [ ] pytest가 통과했다.
 - [ ] 공개 릴리스 감사가 통과했다.
 - [ ] 정답 비노출 입력팩 CLI가 통과했다.
+- [ ] 공식 frozen 입력팩 재생성 비교가 통과했다.
+- [ ] 공식 frozen 입력팩 SHA-256 검증이 통과했다.
 - [ ] 단일 평가 CLI가 통과했다.
 - [ ] 비교 CLI가 통과했다.
 - [ ] 반복 평가 CLI가 통과했다.
