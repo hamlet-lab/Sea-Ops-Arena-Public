@@ -4,12 +4,24 @@
 
 목적은 특정 모델을 유리하게 만드는 것이 아니라, 같은 입력 조건에서 결과를 다시 비교할 수 있도록 실험 조건을 고정하는 것입니다.
 
+## 공식 baseline 입력팩
+
+첫 baseline부터 다음 파일을 **고정 입력**으로 사용합니다.
+
+- 평가용 시나리오: `examples/scenarios/public_suite_v2.json`
+- 모델용 입력팩: `examples/input_packs/public_suite_v2.input.json`
+- 입력팩 SHA-256: `e68cf82311d4c4b6477799cf61aeb28b4f446d997e5a3c82b3c6ebb9680b88db`
+
+입력팩은 `arena-input-pack-v2` 생성기로 만들어진 결과를 저장소에 그대로 고정한 파일입니다. CI는 같은 시나리오에서 입력팩을 다시 생성한 뒤 공식 파일과 **바이트 단위로 비교**하고, 별도 `.sha256` 파일도 검증합니다.
+
+따라서 첫 baseline 결과가 위 해시와 다른 입력팩을 가리키면 같은 실험으로 취급하지 않습니다.
+
 ## 기본 트랙: text-only / no-tools
 
 첫 baseline은 다음 조건을 사용합니다.
 
-1. 평가용 시나리오 파일에서 `arena-input-pack-v2`를 생성합니다.
-2. 모델에는 생성된 입력팩만 제공합니다.
+1. 공식 frozen 입력팩을 그대로 사용합니다.
+2. 모델에는 해당 입력팩의 내용만 제공합니다.
 3. 입력팩 밖의 웹검색, RAG, 외부 도구, 별도 문서를 사용하지 않습니다.
 4. 모델에는 다른 반복 실행의 답이나 평가 정답을 제공하지 않습니다.
 5. 각 반복은 이전 반복의 대화 상태를 재사용하지 않는 새 실행으로 수행합니다.
@@ -25,7 +37,7 @@
 
 ## 모델에 전달하는 정보
 
-모델에 전달하는 내용은 생성된 `arena-input-pack-v2` 파일의 내용입니다.
+모델에 전달하는 내용은 `examples/input_packs/public_suite_v2.input.json`의 내용입니다.
 
 입력팩 안에는 다음이 포함됩니다.
 
@@ -42,6 +54,25 @@
 - SEA 내부 구조 또는 판단 정보
 - 비공개 프롬프트나 시스템 메시지
 - 이전 반복의 답
+
+## 입력팩 무결성 확인
+
+실험을 시작하기 전 고정 파일의 해시를 확인할 수 있습니다.
+
+```bash
+cd examples/input_packs
+sha256sum -c public_suite_v2.input.sha256
+```
+
+또는 생성기로 다시 만든 결과와 비교할 수 있습니다.
+
+```bash
+sea-ops-arena-input-pack \
+  --suite examples/scenarios/public_suite_v2.json \
+  --output /tmp/public_suite_v2.input.json
+
+cmp /tmp/public_suite_v2.input.json examples/input_packs/public_suite_v2.input.json
+```
 
 ## 샘플링 설정
 
@@ -84,30 +115,32 @@
 ```bash
 sea-ops-arena \
   --suite examples/scenarios/public_suite_v2.json \
-  --input-pack model-input.json \
+  --input-pack examples/input_packs/public_suite_v2.input.json \
   --decisions run-001.public.json
 ```
 
 ```bash
 sea-ops-arena-repeat \
   --suite examples/scenarios/public_suite_v2.json \
-  --input-pack model-input.json \
+  --input-pack examples/input_packs/public_suite_v2.input.json \
   --results run-001.public.json run-002.public.json run-003.public.json
 ```
 
-여러 모델을 비교할 경우에도 **같은 평가용 시나리오와 같은 입력팩**을 사용합니다.
+여러 모델을 비교할 경우에도 **같은 평가용 시나리오와 같은 frozen 입력팩**을 사용합니다.
 
 ## 공개 전 검증
 
 실제 결과를 저장소에 추가하기 전에 다음을 모두 통과해야 합니다.
 
-1. 결과 파일 포맷 검증
-2. request ID 커버리지 검증
-3. `suite_sha256` 검증
-4. `input_pack_sha256` 검증
-5. 공개 릴리스 감사
-6. 저장소 밖 내부 명칭 검사
-7. 여러 공개 파일을 조합한 의미 단위 역추론 검토
+1. 공식 frozen 입력팩 SHA-256 검증
+2. 공식 입력팩과 생성기 재생성 결과의 바이트 단위 일치
+3. 결과 파일 포맷 검증
+4. request ID 커버리지 검증
+5. `suite_sha256` 검증
+6. `input_pack_sha256` 검증
+7. 공개 릴리스 감사
+8. 저장소 밖 내부 명칭 검사
+9. 여러 공개 파일을 조합한 의미 단위 역추론 검토
 
 ## SEA와의 경계
 
