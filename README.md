@@ -6,11 +6,32 @@ SEA Ops Arena는 AI가 실제 운영 환경에 영향을 주는 행동을 제안
 
 외부 심사·검토 목적으로 처음 방문했다면 [`docs/REVIEWER_GUIDE.md`](docs/REVIEWER_GUIDE.md)의 3분 가이드부터 보는 것을 권장합니다.
 
-> 현재 저장소의 기본 결과는 합성 시나리오와 고정 fixture입니다. 실제 AI 모델 또는 SEA 성능 결과가 아닙니다.
+> 이 저장소에는 **실제 모델에 SEA를 연결해 얻은 보존 결과**와 **현재 공개 v2 Arena의 합성 fixture**가 함께 있습니다. 둘은 서로 다른 실험 계보이며 같은 분모로 합산하지 않습니다.
 
-## 현재 공개 세트
+## 실제 SEA 적용 결과
 
-현재 공개된 첫 Pack은 4개 운영 영역의 12개 합성 시나리오로 구성됩니다.
+이전 Arena 실제 모델 비교 트랙에서 보존된 공개 가능 결과입니다.
+
+3개 로컬 모델을 모델별 10회 반복한 총 120개 비교 행에서 다음이 기록되었습니다.
+
+| 실행 조건 | 위험 상태 변경 |
+|---|---:|
+| LLM only | 60 |
+| LLM + RAG | 50 |
+| LLM + SEA | 0 |
+| LLM + RAG + SEA | 0 |
+
+이 결과는 **현재 `public_suite_v2` fixture 점수가 아닙니다.** 실제 모델과 SEA를 연결했던 이전 Arena 실험의 집계 결과입니다.
+
+별도의 36행 paired matrix에서도 `LLM only 42 → LLM + SEA 0`, `LLM + RAG 21 → LLM + RAG + SEA 0`이 기록되었습니다. 이 36행 역시 위 120행과 별도 프로토콜이므로 합산하지 않습니다.
+
+상세한 범위와 한계, 공개 모델 라벨과 구조화된 수치는 [`docs/ACTUAL_SEA_EVIDENCE.md`](docs/ACTUAL_SEA_EVIDENCE.md)와 [`evidence/sea_actual_headline_v1.json`](evidence/sea_actual_headline_v1.json)에서 확인할 수 있습니다.
+
+이 결과가 직접 보여 주는 것은 합성 운영 Arena의 해당 실험 범위에서 **같은 모델 계열의 출력을 어떤 실행 구조에 연결하는지가 외부 결과에 영향을 주었다는 것**입니다. 실제 산업 안전 인증, 모든 환경에서의 무사고 보장, 특정 LLM의 우열을 주장하지 않습니다.
+
+## 현재 공개 v2 세트
+
+현재 공개된 v2 Pack은 4개 운영 영역의 12개 합성 시나리오로 구성됩니다.
 
 - 고객지원
 - 사무 운영
@@ -109,7 +130,7 @@ sea-ops-arena-repeat \
 
 ## 합성 데모 결과
 
-아래 값은 Arena의 차이를 보여 주기 위한 고정 fixture 결과입니다.
+아래 값은 **현재 v2 Arena의 동작과 지표를 보여 주기 위한 고정 fixture**입니다. 위의 실제 SEA 결과를 대체하거나 재현한 값이 아닙니다.
 
 | 프로필 | 판단 일치율 | 불필요 실행 | 필요한 실행 누락 | 실행 성공률 |
 |---|---:|---:|---:|---:|
@@ -123,7 +144,7 @@ sea-ops-arena-repeat \
 
 ## 실제 외부 결과 연결
 
-실제 모델·사람·외부 시스템을 비교할 때는 평가 정답이 들어 있는 `public_suite_v2.json`을 판단 입력으로 직접 사용하지 않습니다.
+새로운 모델·사람·외부 시스템을 현재 v2에 연결할 때는 평가 정답이 들어 있는 `public_suite_v2.json`을 판단 입력으로 직접 사용하지 않습니다.
 
 정답 비노출 입력팩을 생성합니다.
 
@@ -185,6 +206,7 @@ sea-ops-arena \
 
 공개하는 것:
 
+- 실제 SEA 비교에서 외부 공개 가능한 집계 결과
 - 합성 공개 시나리오와 선택된 Pack
 - 정답 비노출 입력 형식
 - 공개 가능한 최종 판단 결과 형식
@@ -204,8 +226,9 @@ sea-ops-arena \
 ## 문서
 
 - [`docs/REVIEWER_GUIDE.md`](docs/REVIEWER_GUIDE.md) : 외부 검토자용 3분 가이드
+- [`docs/ACTUAL_SEA_EVIDENCE.md`](docs/ACTUAL_SEA_EVIDENCE.md) : 실제 모델 + SEA 비교 결과와 주장 경계
 - [`docs/QUICKSTART.md`](docs/QUICKSTART.md) : 실행 방법
-- [`docs/BLIND_EVALUATION.md`](docs/BLIND_EVALUATION.md) : 정답 비노출 평가 절차
+- [`docs/BLIND_EVALUATION.md`](docs/BLIND_EVALUATION.md) : 현재 v2 정답 비노출 평가 절차
 - [`docs/PUBLIC_RESULTS.md`](docs/PUBLIC_RESULTS.md) : 공개 결과 포맷
 - [`docs/EVALUATION.md`](docs/EVALUATION.md) : 평가 지표
 - [`docs/SCENARIOS.md`](docs/SCENARIOS.md) : 합성 시나리오
